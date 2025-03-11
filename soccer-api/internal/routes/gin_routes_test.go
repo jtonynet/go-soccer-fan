@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,6 +20,7 @@ type fakeDB struct {
 	championships []*entity.Championship
 	teams         []*entity.Team
 	matchs        []*entity.Match
+	fans          []*entity.Fan
 }
 
 func NewFakeDB() *fakeDB {
@@ -117,17 +120,52 @@ func NewfakeChampionshipRepo(dbConn *fakeDB) *fakeChampionshipRepo {
 	}
 }
 
-func (fcr *fakeChampionshipRepo) FindAll(ctx context.Context) ([]*entity.Championship, error) {
+func (fcr *fakeChampionshipRepo) FindAll(_ context.Context) ([]*entity.Championship, error) {
 	return fcr.dbConn.championships, nil
 }
 
-func (fcr *fakeChampionshipRepo) FindMatchsByChampionshipUID(ctx context.Context, uid uuid.UUID) ([]*entity.Match, error) {
+func (fcr *fakeChampionshipRepo) FindMatchsByChampionshipUID(_ context.Context, uid uuid.UUID) ([]*entity.Match, error) {
 	return fcr.dbConn.matchs, nil
+}
+
+type fakeFanRepo struct {
+	dbConn *fakeDB
+}
+
+func NewfakeFanRepo(dbConn *fakeDB) *fakeFanRepo {
+	return &fakeFanRepo{
+		dbConn,
+	}
+}
+
+func (ffr *fakeFanRepo) Create(_ context.Context, fEntity *entity.Fan) (*entity.Fan, error) {
+
+	var teamFounded *entity.Team
+	for _, team := range ffr.dbConn.teams {
+		if team.Name == fEntity.Team.Name {
+			teamFounded = team
+		}
+	}
+
+	if teamFounded == nil {
+		return nil, fmt.Errorf("team not found")
+	}
+
+	fanCreated := &entity.Fan{
+		ID:    len(ffr.dbConn.fans) + 1,
+		UID:   fEntity.UID,
+		Name:  fEntity.Name,
+		Email: fEntity.Email,
+		Team:  teamFounded,
+	}
+
+	ffr.dbConn.fans = append(ffr.dbConn.fans, fanCreated)
+	return fanCreated, nil
 }
 
 type ginRoutesSuite struct {
 	suite.Suite
-	r *ginRouter
+	r *ginRoutes
 }
 
 func TestGinRoutesSuite(t *testing.T) {
@@ -137,8 +175,10 @@ func TestGinRoutesSuite(t *testing.T) {
 func (suite *ginRoutesSuite) SetupSuite() {
 	fDB := NewFakeDB()
 	fakeCRepo := NewfakeChampionshipRepo(fDB)
+	fakeFRepo := NewfakeFanRepo(fDB)
 	cService := service.NewChampionship(fakeCRepo)
-	suite.r = NewGinRouter(cService)
+	fService := service.NewFan(fakeFRepo)
+	suite.r = NewGinRoutes(cService, fService)
 }
 
 func (suite *ginRoutesSuite) TestGetChampionshipsSuccesfully() {
@@ -146,11 +186,11 @@ func (suite *ginRoutesSuite) TestGetChampionshipsSuccesfully() {
 	assert.NoError(suite.T(), err)
 
 	resp := httptest.NewRecorder()
-	suite.r.Router.ServeHTTP(resp, req)
+	suite.r.engine.ServeHTTP(resp, req)
 	assert.Equal(suite.T(), http.StatusOK, resp.Code)
 
-	c := gjson.Get(resp.Body.String(), "campeonatos").Array()
-	assert.Equal(suite.T(), 2, len(c))
+	championship := gjson.Get(resp.Body.String(), "campeonatos").Array()
+	assert.Equal(suite.T(), 2, len(championship))
 }
 
 func (suite *ginRoutesSuite) TestGetChampionshipMatchsWithoutFiltersSuccesfully() {
@@ -158,9 +198,35 @@ func (suite *ginRoutesSuite) TestGetChampionshipMatchsWithoutFiltersSuccesfully(
 	assert.NoError(suite.T(), err)
 
 	resp := httptest.NewRecorder()
-	suite.r.Router.ServeHTTP(resp, req)
+	suite.r.engine.ServeHTTP(resp, req)
 	assert.Equal(suite.T(), http.StatusOK, resp.Code)
 
-	c := gjson.Get(resp.Body.String(), "rodadas").Array()
-	assert.Equal(suite.T(), 2, len(c))
+	rounds := gjson.Get(resp.Body.String(), "rodadas").Array()
+	assert.Equal(suite.T(), 2, len(rounds))
+}
+
+func (suite *ginRoutesSuite) TestPostFanSuccessfully() {
+	reqBody := `
+		{
+			"nome" : "João Silva",
+			"email": "joao.silva@example.com",
+			"time" : "Flamengo"
+		}
+	`
+
+	req, err := http.NewRequest("POST", "/torcedores", bytes.NewBuffer([]byte(reqBody)))
+	assert.NoError(suite.T(), err)
+
+	resp := httptest.NewRecorder()
+	suite.r.engine.ServeHTTP(resp, req)
+	assert.Equal(suite.T(), http.StatusAccepted, resp.Code)
+
+	assert.Equal(suite.T(), "João Silva", gjson.Get(resp.Body.String(), "nome").String())
+	assert.Equal(suite.T(), "joao.silva@example.com", gjson.Get(resp.Body.String(), "email").String())
+	assert.Equal(suite.T(), "Flamengo", gjson.Get(resp.Body.String(), "time").String())
+	assert.Equal(
+		suite.T(),
+		"Cadastro realizado com sucesso",
+		gjson.Get(resp.Body.String(), "mensagem").String(),
+	)
 }

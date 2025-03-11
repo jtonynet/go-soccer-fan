@@ -29,7 +29,7 @@ func (c *Championship) FindAll() (*dto.ChampionshipResponseList, error) {
 	return result, nil
 }
 
-func (c *Championship) FindMatchsByChampionshipUID(uid uuid.UUID) (*dto.MatchResponseList, error) {
+func (c *Championship) FindMatchsByChampionshipUID(uid uuid.UUID) (*dto.RoundResponseList, error) {
 	matchEntities, err := c.cRepo.FindMatchsByChampionshipUID(context.Background(), uid)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (c *Championship) FindMatchsByChampionshipUID(uid uuid.UUID) (*dto.MatchRes
 	return mapMatchEntitiesToResponseListDTO(matchEntities), nil
 }
 
-func mapMatchEntitiesToResponseListDTO(mEntities []*entity.Match) *dto.MatchResponseList {
+func mapMatchEntitiesToResponseListDTO(mEntities []*entity.Match) *dto.RoundResponseList {
 	roundsMap := map[int]dto.MatchResponseListPerRound{}
 	for _, mEntity := range mEntities {
 		var matchsPerRound dto.MatchResponseListPerRound
@@ -69,7 +69,7 @@ func mapMatchEntitiesToResponseListDTO(mEntities []*entity.Match) *dto.MatchResp
 		rounds = append(rounds, &matchsPerRound)
 	}
 
-	return &dto.MatchResponseList{
+	return &dto.RoundResponseList{
 		Rounds: rounds,
 	}
 }
