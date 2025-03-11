@@ -41,9 +41,11 @@ __[Go Soccer Fan](#header)__<br/>
       - 🌐 [Ambiente](#environment)
       - 🐋 [Conteinerizado](#run-containerized)
   4.  ✅ [Testes](#tests)
-  5.  📊 [Diagramas](#diagrams)
-  6.  🤖 [Uso de IA](#ia)
-  7.  🏁 [Conclusão](#conclusion)
+  5.  🧠 [ADR - Architecture Decision Records](#adr)
+  6.  🔢 [Versões](#versions)
+  7.  📊 [Diagramas](#diagrams)
+  8.  🤖 [Uso de IA](#ia)
+  9.  🏁 [Conclusão](#conclusion)
 
 <hr/>
 
@@ -111,6 +113,32 @@ __[Go Soccer Fan](#header)__<br/>
 
 ---
 
+<a id="adr"></a> 
+### 🧠 ADR - Architecture Decision Records
+
+- [0001: Registro de Decisões de Arquitetura (ADR)](./docs/architecture/decisions/0001-registro-de-decisoes-de-arquitetura.md)
+- [0002: Go, Gin, Gorm e PostgreSQL com Arquitetura Três Camadas e TDD](./docs/architecture/decisions/0002-go-gin-gorm-e-postgres-com-arquitetura-tres-camadas-e-tdd.md)
+
+
+<br/>
+
+[⤴️ de volta ao índice](#index)
+
+---
+
+<a id="versions"></a>
+### 🔢 Versões
+
+As tags de versões estão sendo criadas manualmente a medida que o projeto avança. Cada tarefa é desenvolvida em uma branch a parte (Branch Based, [feature branch](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow)) e quando finalizadas é gerada tag e mergeadas em main.
+
+Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.md).
+
+<br/>
+
+[⤴️ de volta ao Index](#index)
+
+---
+
 <a id="ia"></a>
 ### 🤖 Uso de IA
 
@@ -129,9 +157,9 @@ IA também é utilizada em minhas pesquisas e estudos como ferramenta de apoio; 
 
 Contrate artistas para projetos comerciais ou mais elaborados e aprenda a ser engenhoso!
 
-[⤴️ de volta ao índice](#index)
-
 <br/>
+
+[⤴️ de volta ao índice](#index)
 
 ---
 
