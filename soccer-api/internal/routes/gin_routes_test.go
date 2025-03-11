@@ -16,9 +16,39 @@ import (
 
 type fakeDB struct {
 	championships []*entity.Championship
+	teams         []*entity.Team
+	matchs        []*entity.Match
 }
 
-func getFakeDB() *fakeDB {
+func NewFakeDB() *fakeDB {
+
+	scoreOne := 1
+	scoreTwo := 3
+
+	flamengo := &entity.Team{
+		ID:   1,
+		UID:  uuid.MustParse("00000000-0000-0000-0000-000000002001"),
+		Name: "Flamengo",
+	}
+
+	vasco := &entity.Team{
+		ID:   2,
+		UID:  uuid.MustParse("00000000-0000-0000-0000-000000002002"),
+		Name: "Vasco",
+	}
+
+	santos := &entity.Team{
+		ID:   3,
+		UID:  uuid.MustParse("00000000-0000-0000-0000-000000002003"),
+		Name: "Santos",
+	}
+
+	corinthians := &entity.Team{
+		ID:   4,
+		UID:  uuid.MustParse("00000000-0000-0000-0000-000000002004"),
+		Name: "Corinthians",
+	}
+
 	return &fakeDB{
 		championships: []*entity.Championship{
 			{
@@ -34,6 +64,46 @@ func getFakeDB() *fakeDB {
 				Season: "2025",
 			},
 		},
+
+		teams: []*entity.Team{
+			flamengo,
+			vasco,
+			santos,
+			corinthians,
+		},
+
+		matchs: []*entity.Match{
+			{
+				ID:             3,
+				UID:            uuid.MustParse("00000000-0000-0000-0000-000000003003"),
+				Round:          2,
+				ChampionshipID: 1,
+				HomeTeam:       flamengo,
+				AwayTeam:       corinthians,
+				HomeTeamScore:  nil,
+				AwayTeamScore:  nil,
+			},
+			{
+				ID:             2,
+				UID:            uuid.MustParse("00000000-0000-0000-0000-000000003002"),
+				Round:          1,
+				ChampionshipID: 1,
+				HomeTeam:       santos,
+				AwayTeam:       corinthians,
+				HomeTeamScore:  &scoreTwo,
+				AwayTeamScore:  &scoreTwo,
+			},
+			{
+				ID:             1,
+				UID:            uuid.MustParse("00000000-0000-0000-0000-000000003001"),
+				Round:          1,
+				ChampionshipID: 1,
+				HomeTeam:       flamengo,
+				AwayTeam:       vasco,
+				HomeTeamScore:  &scoreTwo,
+				AwayTeamScore:  &scoreOne,
+			},
+		},
 	}
 }
 
@@ -41,14 +111,18 @@ type fakeChampionshipRepo struct {
 	dbConn *fakeDB
 }
 
-func newfakeChampionshipRepo(dbConn *fakeDB) *fakeChampionshipRepo {
+func NewfakeChampionshipRepo(dbConn *fakeDB) *fakeChampionshipRepo {
 	return &fakeChampionshipRepo{
 		dbConn,
 	}
 }
 
 func (fcr *fakeChampionshipRepo) FindAll(ctx context.Context) ([]*entity.Championship, error) {
-	return nil, nil
+	return fcr.dbConn.championships, nil
+}
+
+func (fcr *fakeChampionshipRepo) FindMatchsByChampionshipUID(ctx context.Context, uid uuid.UUID) ([]*entity.Match, error) {
+	return fcr.dbConn.matchs, nil
 }
 
 type ginRoutesSuite struct {
@@ -61,13 +135,13 @@ func TestGinRoutesSuite(t *testing.T) {
 }
 
 func (suite *ginRoutesSuite) SetupSuite() {
-	fDB := getFakeDB()
-	fakeCRepo := newfakeChampionshipRepo(fDB)
+	fDB := NewFakeDB()
+	fakeCRepo := NewfakeChampionshipRepo(fDB)
 	cService := service.NewChampionship(fakeCRepo)
 	suite.r = NewGinRouter(cService)
 }
 
-func (suite *ginRoutesSuite) TestHappyPath() {
+func (suite *ginRoutesSuite) TestGetChampionshipsSuccesfully() {
 	req, err := http.NewRequest("GET", "/campeonatos", nil)
 	assert.NoError(suite.T(), err)
 
@@ -77,4 +151,13 @@ func (suite *ginRoutesSuite) TestHappyPath() {
 
 	c := gjson.Get(resp.Body.String(), "campeonatos").Array()
 	assert.Equal(suite.T(), 2, len(c))
+}
+
+func (suite *ginRoutesSuite) TestGetChampionshipMatchsWithoutFiltersSuccesfully() {
+	req, err := http.NewRequest("GET", "/campeonatos/00000000-0000-0000-0000-000000001001/partidas", nil)
+	assert.NoError(suite.T(), err)
+
+	resp := httptest.NewRecorder()
+	suite.r.Router.ServeHTTP(resp, req)
+	assert.Equal(suite.T(), http.StatusOK, resp.Code)
 }
