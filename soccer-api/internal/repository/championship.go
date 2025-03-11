@@ -6,6 +6,6 @@ import (
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/entity"
 )
 
-type Championshiper interface {
+type Championship interface {
 	FindAll(ctx context.Context) ([]*entity.Championship, error)
 }

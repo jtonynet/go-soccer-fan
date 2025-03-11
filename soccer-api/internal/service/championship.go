@@ -9,10 +9,10 @@ import (
 )
 
 type Championship struct {
-	cRepo repository.Championshiper
+	cRepo repository.Championship
 }
 
-func NewChampionship(cRepo repository.Championshiper) *Championship {
+func NewChampionship(cRepo repository.Championship) *Championship {
 	return &Championship{cRepo}
 }
 
