@@ -93,7 +93,25 @@ __[Go Soccer Fan](#header)__<br/>
 <a id="tests"></a>
 ### ✅ Testes
 
-**TODO**
+Rodando localmente com `GO v1.23.2`
+
+Caso não tenha as dependência instaladas, instale-as localmente na pasta da `API`:
+```bash
+cd soccer-api
+go mod download
+```
+
+<br/>
+
+Performe os testes na pasta da `API`:
+```bash
+go test -v -count=1 ./internal/routes
+```
+
+Saída esperada (rodando no terminal do VScode):
+<div align="center">
+    <img src="./docs/assets/images/layout/screen-captures/tests_vscode_terminal.png">
+</div>
 
 <br/>
 

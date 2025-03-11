@@ -5,14 +5,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/dto"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/service"
 )
 
-type ginRouter struct {
-	Router *gin.Engine
+type ginRoutes struct {
+	engine *gin.Engine
 }
 
-func NewGinRouter(cService *service.Championship) *ginRouter {
+func NewGinRoutes(cService *service.Championship, fService *service.Fan) *ginRoutes {
 	e := gin.Default()
 
 	e.GET("/campeonatos", func(c *gin.Context) {
@@ -24,7 +25,7 @@ func NewGinRouter(cService *service.Championship) *ginRouter {
 		uid, err := uuid.Parse(c.Param("uid"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "campeonato com ID invalido",
+				"erro": "campeonato com URI ID inválido",
 			})
 			return
 		}
@@ -33,11 +34,33 @@ func NewGinRouter(cService *service.Championship) *ginRouter {
 		c.JSON(http.StatusOK, result)
 	})
 
-	return &ginRouter{
-		Router: e,
+	e.POST("/torcedores", func(c *gin.Context) {
+		var fReq dto.FanCreateRequest
+		if err := c.ShouldBindJSON(&fReq); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"erro": "corpo da requisição inválido",
+			})
+			return
+		}
+
+		// TODO: VALIDATES DTO IN FUTURE
+
+		fResp, err := fService.Create(&fReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"erro": "erro interno, tente novamente mais tarde",
+			})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, fResp)
+	})
+
+	return &ginRoutes{
+		engine: e,
 	}
 }
 
-func (gr *ginRouter) Run() error {
-	return gr.Router.Run()
+func (gr *ginRoutes) Run() error {
+	return gr.engine.Run()
 }
