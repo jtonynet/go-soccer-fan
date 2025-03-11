@@ -20,20 +20,13 @@ func NewChampionship(cRepo repository.Championship) *Championship {
 
 func (c *Championship) FindAll() (*dto.ChampionshipResponseList, error) {
 
-	championshipEntities, err := c.cRepo.FindAll(context.Background())
+	cEntities, err := c.cRepo.FindAll(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	result := dto.ChampionshipResponseList{}
-	for _, cEntity := range championshipEntities {
-		result.Championships = append(
-			result.Championships,
-			mapChampionshipEntityToResponseDTO(cEntity),
-		)
-	}
-
-	return &result, nil
+	result := mapChampionshipEntitiesToResponseListDTO(cEntities)
+	return result, nil
 }
 
 func (c *Championship) FindMatchsByChampionshipUID(uid uuid.UUID) (*dto.MatchResponseList, error) {
@@ -81,10 +74,18 @@ func mapMatchEntitiesToResponseListDTO(mEntities []*entity.Match) *dto.MatchResp
 	}
 }
 
-func mapChampionshipEntityToResponseDTO(ce *entity.Championship) *dto.ChampionshipResponse {
-	return &dto.ChampionshipResponse{
-		UID:    ce.UID,
-		Name:   ce.Name,
-		Season: ce.Season,
+func mapChampionshipEntitiesToResponseListDTO(cEntities []*entity.Championship) *dto.ChampionshipResponseList {
+	result := dto.ChampionshipResponseList{}
+	for _, cEntity := range cEntities {
+		result.Championships = append(
+			result.Championships,
+			&dto.ChampionshipResponse{
+				UID:    cEntity.UID,
+				Name:   cEntity.Name,
+				Season: cEntity.Season,
+			},
+		)
 	}
+
+	return &result
 }

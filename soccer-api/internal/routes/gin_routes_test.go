@@ -160,4 +160,7 @@ func (suite *ginRoutesSuite) TestGetChampionshipMatchsWithoutFiltersSuccesfully(
 	resp := httptest.NewRecorder()
 	suite.r.Router.ServeHTTP(resp, req)
 	assert.Equal(suite.T(), http.StatusOK, resp.Code)
+
+	c := gjson.Get(resp.Body.String(), "rodadas").Array()
+	assert.Equal(suite.T(), 2, len(c))
 }
