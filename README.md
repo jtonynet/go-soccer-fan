@@ -123,11 +123,12 @@ erDiagram
     matches {
         int id pk
         UUID uid
-        int home_team_id fk
-        int away_team_id fk
-        string score
         int round
         int championship_id fk
+        int home_team_id fk
+        int away_team_id fk
+        int home_team_score
+        int away_team_score
     }
 
     teams {
