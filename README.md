@@ -44,6 +44,7 @@ __[Go Soccer Fan](#header)__<br/>
   5.  🧠 [ADR - Architecture Decision Records](#adr)
   6.  🔢 [Versões](#versions)
   7.  📊 [Diagramas](#diagrams)
+      - 📈 [ER](#diagrams-erchart)
   8.  🤖 [Uso de IA](#ia)
   9.  🏁 [Conclusão](#conclusion)
 
@@ -105,11 +106,54 @@ __[Go Soccer Fan](#header)__<br/>
 <a id="diagrams"></a>
 ### 📊 Diagramas
 
-**TODO**
+<a id="diagrams-erchart"></a>
+#### 📈 ER
 
-[⤴️ de volta ao índice](#index)
+<div align="center">
+
+```mermaid
+erDiagram
+    championships {
+        int id pk
+        UUID uid
+        string name
+        string season
+    }
+    
+    matches {
+        int id pk
+        UUID uid
+        int home_team_id fk
+        int away_team_id fk
+        string score
+        int round
+        int championship_id fk
+    }
+
+    teams {
+        int id pk
+        UUID uid
+        string name
+    }
+
+    fans {
+        int id pk
+        UUID uid
+        string name
+        string email
+        int team_id fk
+    }
+
+    championships ||--o{ matches : possesses
+    matches ||--o{ teams : involves
+    fans ||--|| teams : supports
+```
+
+</div>
 
 <br/>
+
+[⤴️ de volta ao índice](#index)
 
 ---
 

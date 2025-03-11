@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+## [0.0.1] - 2025-10-03
+### Added
+- [Issue 2](https://github.com/jtonynet/go-soccer-fan/issues/2)
+  - Adicionado Diagrama Entidade Relacionamento base ao `README`
+
 ## [0.0.0] - 2025-10-03
 ### Added
 
