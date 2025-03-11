@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.2] - 2025-11-03
 ### Added
-- [Issue 2](https://github.com/jtonynet/go-soccer-fan/issues/3)
+- [Issue 3](https://github.com/jtonynet/go-soccer-fan/issues/3)
   - Criada Service com `TDD` com repository fake sendo injetada. Performando consultas que obedecem ao `Diagrama Entidade Relacionamento` anteriormente criado.
 
 ## [0.0.1] - 2025-10-03
