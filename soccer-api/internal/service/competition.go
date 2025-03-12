@@ -10,27 +10,27 @@ import (
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository"
 )
 
-type Championship struct {
-	cRepo repository.Championship
+type Competition struct {
+	cRepo repository.Competition
 }
 
-func NewChampionship(cRepo repository.Championship) *Championship {
-	return &Championship{cRepo}
+func NewCompetition(cRepo repository.Competition) *Competition {
+	return &Competition{cRepo}
 }
 
-func (c *Championship) FindAll() (*dto.ChampionshipResponseList, error) {
+func (c *Competition) FindAll() (*dto.CompetitionResponseList, error) {
 
 	cEntities, err := c.cRepo.FindAll(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	result := mapChampionshipEntitiesToResponseListDTO(cEntities)
+	result := mapCompetitionEntitiesToResponseListDTO(cEntities)
 	return result, nil
 }
 
-func (c *Championship) FindMatchsByChampionshipUID(uid uuid.UUID) (*dto.RoundResponseList, error) {
-	matchEntities, err := c.cRepo.FindMatchsByChampionshipUID(context.Background(), uid)
+func (c *Competition) FindMatchsByCompetitionUID(uid uuid.UUID) (*dto.MatchResponseList, error) {
+	matchEntities, err := c.cRepo.FindMatchsByCompetitionUID(context.Background(), uid)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (c *Championship) FindMatchsByChampionshipUID(uid uuid.UUID) (*dto.RoundRes
 	return mapMatchEntitiesToResponseListDTO(matchEntities), nil
 }
 
-func mapMatchEntitiesToResponseListDTO(mEntities []*entity.Match) *dto.RoundResponseList {
+func mapMatchEntitiesToResponseListDTO(mEntities []*entity.Match) *dto.MatchResponseList {
 	roundsMap := map[int]dto.MatchResponseListPerRound{}
 	for _, mEntity := range mEntities {
 		var matchsPerRound dto.MatchResponseListPerRound
@@ -69,22 +69,30 @@ func mapMatchEntitiesToResponseListDTO(mEntities []*entity.Match) *dto.RoundResp
 		rounds = append(rounds, &matchsPerRound)
 	}
 
-	return &dto.RoundResponseList{
+	if len(rounds) == 0 {
+		rounds = []*dto.MatchResponseListPerRound{}
+	}
+
+	return &dto.MatchResponseList{
 		Rounds: rounds,
 	}
 }
 
-func mapChampionshipEntitiesToResponseListDTO(cEntities []*entity.Championship) *dto.ChampionshipResponseList {
-	result := dto.ChampionshipResponseList{}
+func mapCompetitionEntitiesToResponseListDTO(cEntities []*entity.Competition) *dto.CompetitionResponseList {
+	result := dto.CompetitionResponseList{}
 	for _, cEntity := range cEntities {
-		result.Championships = append(
-			result.Championships,
-			&dto.ChampionshipResponse{
+		result.Competitions = append(
+			result.Competitions,
+			&dto.CompetitionResponse{
 				UID:    cEntity.UID,
 				Name:   cEntity.Name,
 				Season: cEntity.Season,
 			},
 		)
+	}
+
+	if len(result.Competitions) == 0 {
+		result.Competitions = []*dto.CompetitionResponse{}
 	}
 
 	return &result

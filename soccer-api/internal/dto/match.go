@@ -11,6 +11,6 @@ type MatchResponseListPerRound struct {
 	Matchs []*MatchResponse `json:"partidas,omitempty"`
 }
 
-type RoundResponseList struct {
-	Rounds []*MatchResponseListPerRound `json:"rodadas,omitempty"`
+type MatchResponseList struct {
+	Rounds []*MatchResponseListPerRound `json:"rodadas"`
 }

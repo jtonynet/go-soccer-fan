@@ -137,8 +137,17 @@ Saída esperada (rodando no terminal do VScode):
 
 ```mermaid
 erDiagram
-    championships {
+    areas {
         int id pk
+        string external_id
+        string name
+        string country_code
+    }
+
+    competitions {
+        int id pk
+        int area_id
+        string external_id
         UUID uid
         string name
         string season
@@ -146,9 +155,10 @@ erDiagram
     
     matches {
         int id pk
+        string external_id
         UUID uid
         int round
-        int championship_id fk
+        int competitions_id fk
         int home_team_id fk
         int away_team_id fk
         int home_team_score
@@ -157,6 +167,7 @@ erDiagram
 
     teams {
         int id pk
+        string external_id
         UUID uid
         string name
     }
@@ -168,8 +179,8 @@ erDiagram
         string email
         int team_id fk
     }
-
-    championships ||--o{ matches : possesses
+    areas ||--o{ competitions : possesses
+    competitions ||--o{ matches : possesses
     matches ||--o{ teams : involves
     fans ||--|| teams : supports
 ```
@@ -263,7 +274,7 @@ Este desafio me permite consolidar conhecimentos e identificar pontos cegos para
 
 #TEST SEEDER
 
-INSERT INTO championships (uid, name, season, created_at, updated_at)
+INSERT INTO competitions (uid, name, season, created_at, updated_at)
 VALUES
     ('00000000-0000-0000-0000-000000001001', 'Campeonato Brasileiro', '2025', NOW(), NOW()),
     ('00000000-0000-0000-0000-000000001002', 'UEFA Champions League', '2025', NOW(), NOW());
@@ -275,7 +286,7 @@ VALUES
     ('00000000-0000-0000-0000-000000002003', 'Santos', NOW(), NOW()),
     ('00000000-0000-0000-0000-000000002004', 'Corinthians', NOW(), NOW());
 
-INSERT INTO matchs (uid, round, championship_id, home_team_id, away_team_id, home_team_score, away_team_score, created_at, updated_at)
+INSERT INTO matches (uid, round, competition_id, home_team_id, away_team_id, home_team_score, away_team_score, created_at, updated_at)
 VALUES
     ('00000000-0000-0000-0000-000000003001', 1, 1, 1, 2, 2, 1, NOW(), NOW()),
     ('00000000-0000-0000-0000-000000003002', 1, 1, 3, 4, 2, 2, NOW(), NOW()),

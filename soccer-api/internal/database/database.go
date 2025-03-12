@@ -35,8 +35,8 @@ func NewGormCom(cfg *config.Database) *GormConn {
 	 removeremos os automigrates e adotaremos o golang migrate
 	 https://github.com/golang-migrate/migrate
 	*/
-	if err := db.AutoMigrate(&model.Championship{}); err != nil {
-		log.Fatalf("cannot automigrate championship: %v", err)
+	if err := db.AutoMigrate(&model.Competition{}); err != nil {
+		log.Fatalf("cannot automigrate competition: %v", err)
 	}
 
 	if err := db.AutoMigrate(&model.Team{}); err != nil {

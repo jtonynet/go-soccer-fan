@@ -12,13 +12,13 @@ func main() {
 	cfg := config.LoadConfig()
 
 	gormConn := database.NewGormCom(cfg.Database)
-	championshipRepo := gormrepo.NewChampionship(gormConn)
+	competitionRepo := gormrepo.NewCompetition(gormConn)
 	fanRepo := gormrepo.NewFan(gormConn)
 
-	championshipService := service.NewChampionship(championshipRepo)
+	competitionService := service.NewCompetition(competitionRepo)
 	fanService := service.NewFan(fanRepo)
 
-	err := routes.NewGinRoutes(championshipService, fanService).Run()
+	err := routes.NewGinRoutes(competitionService, fanService).Run()
 	if err != nil {
 		panic("cant initiate routes")
 	}

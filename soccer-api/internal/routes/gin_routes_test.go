@@ -17,10 +17,10 @@ import (
 )
 
 type fakeDB struct {
-	championships []*entity.Championship
-	teams         []*entity.Team
-	matches       []*entity.Match
-	fans          []*entity.Fan
+	competitions []*entity.Competition
+	teams        []*entity.Team
+	matches      []*entity.Match
+	fans         []*entity.Fan
 }
 
 func NewFakeDB() *fakeDB {
@@ -53,7 +53,7 @@ func NewFakeDB() *fakeDB {
 	}
 
 	return &fakeDB{
-		championships: []*entity.Championship{
+		competitions: []*entity.Competition{
 			{
 				ID:     1,
 				UID:    uuid.MustParse("00000000-0000-0000-0000-000000001001"),
@@ -77,54 +77,54 @@ func NewFakeDB() *fakeDB {
 
 		matches: []*entity.Match{
 			{
-				ID:             3,
-				UID:            uuid.MustParse("00000000-0000-0000-0000-000000003003"),
-				Round:          2,
-				ChampionshipID: 1,
-				HomeTeam:       flamengo,
-				AwayTeam:       corinthians,
-				HomeTeamScore:  nil,
-				AwayTeamScore:  nil,
+				ID:            3,
+				UID:           uuid.MustParse("00000000-0000-0000-0000-000000003003"),
+				Round:         2,
+				CompetitionID: 1,
+				HomeTeam:      flamengo,
+				AwayTeam:      corinthians,
+				HomeTeamScore: nil,
+				AwayTeamScore: nil,
 			},
 			{
-				ID:             2,
-				UID:            uuid.MustParse("00000000-0000-0000-0000-000000003002"),
-				Round:          1,
-				ChampionshipID: 1,
-				HomeTeam:       santos,
-				AwayTeam:       corinthians,
-				HomeTeamScore:  &scoreTwo,
-				AwayTeamScore:  &scoreTwo,
+				ID:            2,
+				UID:           uuid.MustParse("00000000-0000-0000-0000-000000003002"),
+				Round:         1,
+				CompetitionID: 1,
+				HomeTeam:      santos,
+				AwayTeam:      corinthians,
+				HomeTeamScore: &scoreTwo,
+				AwayTeamScore: &scoreTwo,
 			},
 			{
-				ID:             1,
-				UID:            uuid.MustParse("00000000-0000-0000-0000-000000003001"),
-				Round:          1,
-				ChampionshipID: 1,
-				HomeTeam:       flamengo,
-				AwayTeam:       vasco,
-				HomeTeamScore:  &scoreTwo,
-				AwayTeamScore:  &scoreOne,
+				ID:            1,
+				UID:           uuid.MustParse("00000000-0000-0000-0000-000000003001"),
+				Round:         1,
+				CompetitionID: 1,
+				HomeTeam:      flamengo,
+				AwayTeam:      vasco,
+				HomeTeamScore: &scoreTwo,
+				AwayTeamScore: &scoreOne,
 			},
 		},
 	}
 }
 
-type fakeChampionshipRepo struct {
+type fakeCompetitionRepo struct {
 	dbConn *fakeDB
 }
 
-func NewFakeChampionshipRepo(dbConn *fakeDB) *fakeChampionshipRepo {
-	return &fakeChampionshipRepo{
+func NewFakeCompetitionRepo(dbConn *fakeDB) *fakeCompetitionRepo {
+	return &fakeCompetitionRepo{
 		dbConn,
 	}
 }
 
-func (fcr *fakeChampionshipRepo) FindAll(_ context.Context) ([]*entity.Championship, error) {
-	return fcr.dbConn.championships, nil
+func (fcr *fakeCompetitionRepo) FindAll(_ context.Context) ([]*entity.Competition, error) {
+	return fcr.dbConn.competitions, nil
 }
 
-func (fcr *fakeChampionshipRepo) FindMatchsByChampionshipUID(_ context.Context, uid uuid.UUID) ([]*entity.Match, error) {
+func (fcr *fakeCompetitionRepo) FindMatchsByCompetitionUID(_ context.Context, uid uuid.UUID) ([]*entity.Match, error) {
 	return fcr.dbConn.matches, nil
 }
 
@@ -174,9 +174,9 @@ func TestGinRoutesSuite(t *testing.T) {
 
 func (suite *ginRoutesSuite) SetupSuite() {
 	fDB := NewFakeDB()
-	fakeCRepo := NewFakeChampionshipRepo(fDB)
+	fakeCRepo := NewFakeCompetitionRepo(fDB)
 	fakeFRepo := NewFakeFanRepo(fDB)
-	cService := service.NewChampionship(fakeCRepo)
+	cService := service.NewCompetition(fakeCRepo)
 	fService := service.NewFan(fakeFRepo)
 	suite.r = NewGinRoutes(cService, fService)
 }

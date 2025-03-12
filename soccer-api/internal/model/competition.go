@@ -2,7 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-type Championship struct {
+type Competition struct {
 	BaseModel
 
 	UID    uuid.UUID `gorm:"type:uuid;uniqueIndex"`
