@@ -1,22 +1,24 @@
 package main
 
 import (
+	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository/gormrepo"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/routes"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/service"
 )
 
 func main() {
+	cfg := config.LoadConfig()
 
-	// TODO: Código chamando fake de testes apenas para validar a API REST Dockerizada. Será removido no próximo PR
-	dbConn := routes.NewFakeDB()
+	gormConn := database.NewGormCom(cfg.Database)
+	championshipRepo := gormrepo.NewChampionship(gormConn)
+	fanRepo := gormrepo.NewFan(gormConn)
 
-	cRepo := routes.NewFakeChampionshipRepo(dbConn)
-	cService := service.NewChampionship(cRepo)
+	championshipService := service.NewChampionship(championshipRepo)
+	fanService := service.NewFan(fanRepo)
 
-	fRepo := routes.NewFakeFanRepo(dbConn)
-	fService := service.NewFan(fRepo)
-
-	err := routes.NewGinRoutes(cService, fService).Run()
+	err := routes.NewGinRoutes(championshipService, fanService).Run()
 	if err != nil {
 		panic("cant initiate routes")
 	}
