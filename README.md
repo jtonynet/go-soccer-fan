@@ -258,3 +258,27 @@ Este desafio me permite consolidar conhecimentos e identificar pontos cegos para
 <img src="./docs/assets/images/layout/footer.png" />
 </a>
 </div>
+
+<!-- 
+
+#TEST SEEDER
+
+INSERT INTO championships (uid, name, season, created_at, updated_at)
+VALUES
+    ('00000000-0000-0000-0000-000000001001', 'Campeonato Brasileiro', '2025', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000001002', 'UEFA Champions League', '2025', NOW(), NOW());
+
+INSERT INTO teams (uid, name, created_at, updated_at)
+VALUES
+    ('00000000-0000-0000-0000-000000002001', 'Flamengo', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000002002', 'Vasco', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000002003', 'Santos', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000002004', 'Corinthians', NOW(), NOW());
+
+INSERT INTO matchs (uid, round, championship_id, home_team_id, away_team_id, home_team_score, away_team_score, created_at, updated_at)
+VALUES
+    ('00000000-0000-0000-0000-000000003001', 1, 1, 1, 2, 2, 1, NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000003002', 1, 1, 3, 4, 2, 2, NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000003003', 2, 1, 1, 4, NULL, NULL, NOW(), NOW());
+
+-->
