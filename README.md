@@ -125,8 +125,6 @@ Saída esperada (rodando no terminal do VScode):
 
 [⤴️ de volta ao índice](#index)
 
-<br/>
-
 ---
 
 <a id="diagrams"></a>
