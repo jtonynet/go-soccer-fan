@@ -1,11 +1,15 @@
 package main
 
 import (
+	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/routes"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/service"
 )
 
 func main() {
+	cfg := config.LoadConfig()
+	_ = database.NewGormCom(cfg.Database)
 
 	// TODO: Código chamando fake de testes apenas para validar a API REST Dockerizada. Será removido no próximo PR
 	dbConn := routes.NewFakeDB()
