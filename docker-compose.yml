@@ -1,0 +1,48 @@
+name: soccer
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    external: false
+
+services:
+
+  postgres:
+    image: postgres:16.0-alpine
+    container_name: postgres
+    hostname: postgres
+    environment:
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: api_pwd
+      POSTGRES_DB: soccer_db_dev
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U api_user -d soccer_db_dev" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - .docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - network
+
+  api-rest:
+    build:
+      context: ./soccer-api
+      dockerfile: Dockerfile
+    env_file:
+      - ./soccer-api/.env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./soccer-api:/usr/src/app
+    networks:
+      - network
+    depends_on:
+      - postgres
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/rest/main /usr/src/app/cmd/rest/main.go" -command="./bin/rest/main"
