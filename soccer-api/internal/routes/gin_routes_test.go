@@ -128,6 +128,10 @@ func (fcr *fakeCompetitionRepo) FindMatchsByCompetitionUID(_ context.Context, ui
 	return fcr.dbConn.matches, nil
 }
 
+func (fcr *fakeCompetitionRepo) CreateOrUpdateInBatch(_ context.Context, cEntities []*entity.Competition) error {
+	return nil
+}
+
 type fakeFanRepo struct {
 	dbConn *fakeDB
 }

@@ -1,13 +1,13 @@
 package dto
 
-type AreaFromExternalAPI struct {
+type AreaResponseExternalAPI struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	CountryCode string `json:"countryCode"`
 }
 
-type AreaResponseExternalAPI struct {
-	Count   int                    `json:"count"`
-	Filters map[string]interface{} `json:"filters"`
-	Areas   []AreaFromExternalAPI  `json:"areas"`
+type AreaResponseListExternalAPI struct {
+	Count   int                       `json:"count"`
+	Filters map[string]interface{}    `json:"filters"`
+	Areas   []AreaResponseExternalAPI `json:"areas"`
 }

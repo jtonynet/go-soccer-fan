@@ -185,7 +185,7 @@ erDiagram
         string email
         int team_id fk
     }
-    areas ||--o{ competitions : possesses
+
     competitions ||--o{ matches : possesses
     matches ||--o{ teams : involves
     fans ||--|| teams : supports

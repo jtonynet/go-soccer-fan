@@ -11,3 +11,13 @@ type CompetitionResponse struct {
 type CompetitionResponseList struct {
 	Competitions []*CompetitionResponse `json:"campeonatos"`
 }
+
+type CompetitionResponseExternalAPI struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+type CompetitionResponseListExternalAPI struct {
+	Count        int                              `json:"count"`
+	Filters      map[string]interface{}           `json:"filters"`
+	Competitions []CompetitionResponseExternalAPI `json:"competitions"`
+}

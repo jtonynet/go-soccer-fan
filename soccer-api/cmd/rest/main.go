@@ -22,8 +22,12 @@ func main() {
 
 	// TODO: mover para cmd/scheduler/main
 	areaRepo := gormrepo.NewArea(gormConn)
-	fetchService := service.NewDataFetchService(cfg.ExternalApi, areaRepo)
-	fetchService.FetchAndStoreData(context.Background())
+	fetchService := service.NewDataFetchService(
+		cfg.ExternalApi,
+		areaRepo,
+		competitionRepo,
+	)
+	fetchService.FetchAndStoreAreaData(context.Background())
 
 	err := routes.NewGinRoutes(competitionService, fanService).Run()
 	if err != nil {

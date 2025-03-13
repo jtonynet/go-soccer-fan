@@ -10,4 +10,5 @@ import (
 type Competition interface {
 	FindAll(ctx context.Context) ([]*entity.Competition, error)
 	FindMatchsByCompetitionUID(ctx context.Context, uid uuid.UUID) ([]*entity.Match, error)
+	CreateOrUpdateInBatch(ctx context.Context, cEntities []*entity.Competition) error
 }

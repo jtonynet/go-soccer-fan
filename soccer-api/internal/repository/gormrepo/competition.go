@@ -8,6 +8,7 @@ import (
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/entity"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Competition struct {
@@ -76,4 +77,27 @@ func (c *Competition) FindMatchsByCompetitionUID(ctx context.Context, uid uuid.U
 	}
 
 	return entityList, nil
+}
+
+func (c *Competition) CreateOrUpdateInBatch(ctx context.Context, cEntities []*entity.Competition) error {
+	if len(cEntities) == 0 {
+		return nil
+	}
+
+	var cModels []model.Competition
+	for _, ce := range cEntities {
+		cModels = append(cModels, model.Competition{
+			UID:        ce.UID,
+			ExternalId: ce.ExternalId,
+			Name:       ce.Name,
+			Season:     ce.Season,
+		})
+	}
+
+	err := c.db.WithContext(ctx).Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "external_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"name", "season"}),
+	}).Create(&cModels).Error
+
+	return err
 }
