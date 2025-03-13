@@ -3,7 +3,7 @@ package entity
 import "github.com/google/uuid"
 
 type Match struct {
-	ID            int
+	ID            uint
 	UID           uuid.UUID
 	Round         int
 	CompetitionID int

@@ -6,6 +6,7 @@ type Match struct {
 	BaseModel
 
 	UID           uuid.UUID   `gorm:"type:uuid;uniqueIndex"`
+	ExternalId    string      `gorm:"type:varchar(255);uniqueIndex"`
 	CompetitionID int         `gorm:"index"`
 	Competition   Competition `gorm:"foreignKey:CompetitionID"`
 	HomeTeamID    int         `gorm:"index"`

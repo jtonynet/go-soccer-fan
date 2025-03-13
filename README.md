@@ -84,7 +84,13 @@ __[Go Soccer Fan](#header)__<br/>
 <a id="run-containerized"></a>
 #### 🐋 Containerizado 
 
-Crie uma copia do arquivo `./soccer-api/.env.SAMPLE` e renomeie para `./soccer-api/.env`. rode o comandos `docker compose` (de acordo com sua versão do docker compose) no diretório raiz do projeto
+Crie uma copia do arquivo `./soccer-api/.env.SAMPLE` e renomeie para `./soccer-api/.env`. Altere o valor da chave `EXTERNAL_API_TOKEN` no arquivo para o `X-Auth-Token` informado no documento de requisitos.
+
+```bash
+EXTERNAL_API_TOKEN=ASK-TO-DEV-TEAM
+```
+
+A seguir, rode o comandos `docker compose` (de acordo com sua versão do docker compose) no diretório raiz do projeto
 
 ```bash
 docker compose up
@@ -291,5 +297,18 @@ VALUES
     ('00000000-0000-0000-0000-000000003001', 1, 1, 1, 2, 2, 1, NOW(), NOW()),
     ('00000000-0000-0000-0000-000000003002', 1, 1, 3, 4, 2, 2, NOW(), NOW()),
     ('00000000-0000-0000-0000-000000003003', 2, 1, 1, 4, NULL, NULL, NOW(), NOW());
+
+TRUNCATE TABLE public.areas RESTART IDENTITY CASCADE;
+TRUNCATE TABLE public.competitions RESTART IDENTITY CASCADE;
+TRUNCATE TABLE public.teams RESTART IDENTITY CASCADE;
+TRUNCATE TABLE public.fans RESTART IDENTITY CASCADE;
+TRUNCATE TABLE public.matches RESTART IDENTITY CASCADE;
+
+ALTER SEQUENCE public.areas_id_seq RESTART WITH 1;
+ALTER SEQUENCE public.competitions_id_seq RESTART WITH 1;
+ALTER SEQUENCE public.fans_id_seq RESTART WITH 1;
+ALTER SEQUENCE public.matches_id_seq RESTART WITH 1;
+ALTER SEQUENCE public.teams_id_seq RESTART WITH 1;
+
 
 -->

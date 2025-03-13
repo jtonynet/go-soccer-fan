@@ -152,7 +152,7 @@ func (ffr *fakeFanRepo) Create(_ context.Context, fEntity *entity.Fan) (*entity.
 	}
 
 	fanCreated := &entity.Fan{
-		ID:    len(ffr.dbConn.fans) + 1,
+		ID:    uint(len(ffr.dbConn.fans) + 1),
 		UID:   fEntity.UID,
 		Name:  fEntity.Name,
 		Email: fEntity.Email,
