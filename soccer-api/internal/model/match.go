@@ -7,11 +7,11 @@ type Match struct {
 
 	UID           uuid.UUID   `gorm:"type:uuid;uniqueIndex"`
 	ExternalId    string      `gorm:"type:varchar(255);uniqueIndex"`
-	CompetitionID int         `gorm:"index"`
+	CompetitionID uint        `gorm:"index"`
 	Competition   Competition `gorm:"foreignKey:CompetitionID"`
-	HomeTeamID    int         `gorm:"index"`
+	HomeTeamID    uint        `gorm:"index"`
 	HomeTeam      Team        `gorm:"foreignKey:HomeTeamID"`
-	AwayTeamID    int         `gorm:"index"`
+	AwayTeamID    uint        `gorm:"index"`
 	AwayTeam      Team        `gorm:"foreignKey:AwayTeamID"`
 	Round         int
 	HomeTeamScore *int

@@ -2,6 +2,7 @@ package gormrepo
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/entity"
@@ -20,16 +21,16 @@ func NewTeam(gConn *database.GormConn) *Team {
 	}
 }
 
-func (t *Team) CreateOrUpdateInBatch(ctx context.Context, aEntities []*entity.Team) error {
+func (t *Team) CreateOrUpdateInBatch(ctx context.Context, aEntities []*entity.Team) ([]*entity.Team, error) {
 	if len(aEntities) == 0 {
-		return nil
+		return nil, errors.New("list of entities is empty")
 	}
 
-	var aModels []model.Team
+	var tModels []model.Team
 	for _, e := range aEntities {
-		aModels = append(aModels, model.Team{
+		tModels = append(tModels, model.Team{
 			UID:        e.UID,
-			ExternalId: e.ExternalId,
+			ExternalId: e.ExternalID,
 			Name:       e.Name,
 			FullName:   e.FullName,
 		})
@@ -38,7 +39,21 @@ func (t *Team) CreateOrUpdateInBatch(ctx context.Context, aEntities []*entity.Te
 	err := t.db.WithContext(ctx).Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "external_id"}},
 		DoUpdates: clause.AssignmentColumns([]string{"name", "full_name"}),
-	}).Create(&aModels).Error
+	}).Create(&tModels).Error
+	if err != nil {
+		return nil, err
+	}
 
-	return err
+	var result []*entity.Team
+	for _, tModel := range tModels {
+		result = append(result, &entity.Team{
+			ID:         tModel.ID,
+			UID:        tModel.UID,
+			ExternalID: tModel.ExternalId,
+			Name:       tModel.Name,
+			FullName:   tModel.FullName,
+		})
+	}
+
+	return result, nil
 }

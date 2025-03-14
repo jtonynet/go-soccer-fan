@@ -7,5 +7,5 @@ import (
 )
 
 type Team interface {
-	CreateOrUpdateInBatch(ctx context.Context, tEntities []*entity.Team) error
+	CreateOrUpdateInBatch(ctx context.Context, tEntities []*entity.Team) ([]*entity.Team, error)
 }

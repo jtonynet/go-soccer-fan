@@ -14,3 +14,26 @@ type MatchResponseListPerRound struct {
 type MatchResponseList struct {
 	Rounds []*MatchResponseListPerRound `json:"rodadas"`
 }
+
+type TeamNested struct {
+	ID int `json:"id"`
+}
+
+type CompetitionNested struct {
+	ID int `json:"id"`
+}
+
+type MatchResponseExternalAPI struct {
+	ID            int               `json:"id"`
+	Competition   CompetitionNested `json:"competition"`
+	HomeTeam      TeamNested        `json:"homeTeam"`
+	AwayTeam      TeamNested        `json:"awayTeam"`
+	Round         int               `json:"matchday"`
+	HomeTeamScore *int              `json:"home_team_score"`
+	AwayTeamScore *int              `json:"away_team_score"`
+}
+
+type MatchResponseListExternalAPI struct {
+	Filters map[string]interface{}     `json:"filters"`
+	Matches []MatchResponseExternalAPI `json:"matches"`
+}

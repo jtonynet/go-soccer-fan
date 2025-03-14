@@ -2,6 +2,7 @@ package gormrepo
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
@@ -79,9 +80,9 @@ func (c *Competition) FindMatchsByCompetitionUID(ctx context.Context, uid uuid.U
 	return entityList, nil
 }
 
-func (c *Competition) CreateOrUpdateInBatch(ctx context.Context, cEntities []*entity.Competition) error {
+func (c *Competition) CreateOrUpdateInBatch(ctx context.Context, cEntities []*entity.Competition) ([]*entity.Competition, error) {
 	if len(cEntities) == 0 {
-		return nil
+		return nil, errors.New("list of entities is empty")
 	}
 
 	var cModels []model.Competition
@@ -98,6 +99,20 @@ func (c *Competition) CreateOrUpdateInBatch(ctx context.Context, cEntities []*en
 		Columns:   []clause.Column{{Name: "external_id"}},
 		DoUpdates: clause.AssignmentColumns([]string{"name", "season"}),
 	}).Create(&cModels).Error
+	if err != nil {
+		return nil, err
+	}
 
-	return err
+	var result []*entity.Competition
+	for _, cModel := range cModels {
+		result = append(result, &entity.Competition{
+			ID:         cModel.ID,
+			UID:        cModel.UID,
+			ExternalId: cModel.ExternalId,
+			Name:       cModel.Name,
+			Season:     cModel.Season,
+		})
+	}
+
+	return result, nil
 }

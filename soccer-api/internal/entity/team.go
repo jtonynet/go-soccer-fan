@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 type Team struct {
 	ID         uint
 	UID        uuid.UUID
-	ExternalId string
+	ExternalID string
 	Name       string
 	FullName   string
 }
