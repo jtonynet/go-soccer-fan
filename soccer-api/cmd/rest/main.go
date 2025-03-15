@@ -21,17 +21,18 @@ func main() {
 	fanService := service.NewFan(fanRepo)
 
 	// TODO: mover para cmd/scheduler/main OU cmd/cli/main
-	areaRepo := gormrepo.NewArea(gormConn)
-	teamRepo := gormrepo.NewTeam(gormConn)
-	matchRepo := gormrepo.NewMatch(gormConn)
-	dataFetchService := service.NewDataFetchService(
-		cfg.ExternalApi,
-		areaRepo,
-		competitionRepo,
-		teamRepo,
-		matchRepo,
-	)
-	dataFetchService.FetchAndStore(context.Background())
+	cli := false
+	if cli {
+		teamRepo := gormrepo.NewTeam(gormConn)
+		matchRepo := gormrepo.NewMatch(gormConn)
+		dataFetchService := service.NewDataFetchService(
+			cfg.ExternalApi,
+			competitionRepo,
+			teamRepo,
+			matchRepo,
+		)
+		dataFetchService.FetchAndStore(context.Background())
+	}
 
 	err := routes.NewGinRoutes(competitionService, fanService).Run()
 	if err != nil {

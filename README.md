@@ -143,13 +143,6 @@ Saída esperada (rodando no terminal do VScode):
 
 ```mermaid
 erDiagram
-    areas {
-        int id pk
-        string external_id
-        string name
-        string country_code
-    }
-
     competitions {
         int id pk
         int area_id
@@ -298,17 +291,15 @@ VALUES
     ('00000000-0000-0000-0000-000000003002', 1, 1, 3, 4, 2, 2, NOW(), NOW()),
     ('00000000-0000-0000-0000-000000003003', 2, 1, 1, 4, NULL, NULL, NOW(), NOW());
 
-TRUNCATE TABLE public.areas RESTART IDENTITY CASCADE;
+
 TRUNCATE TABLE public.competitions RESTART IDENTITY CASCADE;
 TRUNCATE TABLE public.teams RESTART IDENTITY CASCADE;
 TRUNCATE TABLE public.fans RESTART IDENTITY CASCADE;
 TRUNCATE TABLE public.matches RESTART IDENTITY CASCADE;
 
-ALTER SEQUENCE public.areas_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.competitions_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.fans_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.matches_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.teams_id_seq RESTART WITH 1;
-
 
 -->
