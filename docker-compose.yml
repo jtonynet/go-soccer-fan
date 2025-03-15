@@ -5,15 +5,15 @@ networks:
     driver: bridge
 
 volumes:
-  postgres-data:
+  soccer-postgres-data:
     external: false
 
 services:
 
   postgres:
     image: postgres:16.0-alpine
-    container_name: postgres
-    hostname: postgres
+    container_name: soccer-postgres
+    hostname: soccer-postgres
     environment:
       POSTGRES_USER: api_user
       POSTGRES_PASSWORD: api_pwd
@@ -26,8 +26,26 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - soccer-postgres-data:/var/lib/postgresql/data
       - .docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - network
+
+  mailhog:
+    container_name: soccer-mailhog
+    hostname: soccer-mailhog
+    image: "mailhog/mailhog:v1.0.1"
+    ports:
+      - "1025:1025"                         # SMTP
+      - "8025:8025"                         # Interface web
+    environment:
+      SMTP_USER: user@soccerfan.com
+      SMTP_PASSWORD: pwd
+      EMAILS_FROM_EMAIL: noreply@soccerfan.com
+      SMTP_PORT: 1025                        # 1025 | 465
+      SMTP_HOST: todo-stunnel
+      EMAILS_FROM_NAME: No reply
+      MAIL_TLS: true
     networks:
       - network
 
@@ -45,11 +63,12 @@ services:
       - network
     depends_on:
       - postgres
+      - mailhog
     command: CompileDaemon -build="go build -o /usr/src/app/bin/rest/main /usr/src/app/cmd/rest/main.go" -command="./bin/rest/main"
 
   api-cli:
-    container_name: soccer-cli
-    hostname: soccer-cli
+    container_name: soccer-api-cli
+    hostname: soccer-api-cli
     build:
       context: ./soccer-api
       dockerfile: Dockerfile
