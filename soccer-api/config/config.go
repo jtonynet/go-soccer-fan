@@ -11,8 +11,14 @@ type Database struct {
 	SSLmode  string
 }
 
+type ExternalApi struct {
+	URL   string
+	Token string
+}
+
 type Config struct {
-	Database *Database
+	Database    *Database
+	ExternalApi *ExternalApi
 }
 
 func LoadConfig() *Config {
@@ -24,6 +30,10 @@ func LoadConfig() *Config {
 			DBname:   os.Getenv("DATABASE_DB"),
 			Port:     os.Getenv("DATABASE_PORT"),
 			SSLmode:  os.Getenv("DATABASE_SSLMODE"),
+		},
+		ExternalApi: &ExternalApi{
+			URL:   os.Getenv("EXTERNAL_API_URL"),
+			Token: os.Getenv("EXTERNAL_API_TOKEN"),
 		},
 	}
 }

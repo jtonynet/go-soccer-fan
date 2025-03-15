@@ -2,10 +2,10 @@ package entity
 
 import "github.com/google/uuid"
 
-type Team struct {
+type Competition struct {
 	ID         uint
 	UID        uuid.UUID
-	ExternalID string
+	ExternalId string
 	Name       string
-	FullName   string
+	Season     string
 }

@@ -13,7 +13,7 @@ type ginRoutes struct {
 	engine *gin.Engine
 }
 
-func NewGinRoutes(cService *service.Championship, fService *service.Fan) *ginRoutes {
+func NewGinRoutes(cService *service.Competition, fService *service.Fan) *ginRoutes {
 	e := gin.Default()
 
 	e.GET("/campeonatos", func(c *gin.Context) {
@@ -30,7 +30,12 @@ func NewGinRoutes(cService *service.Championship, fService *service.Fan) *ginRou
 			return
 		}
 
-		result, _ := cService.FindMatchsByChampionshipUID(uid)
+		result, err := cService.FindMatchsByCompetitionUID(uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"erro": "erro interno, tente novamente mais tarde",
+			})
+		}
 		c.JSON(http.StatusOK, result)
 	})
 

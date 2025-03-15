@@ -42,7 +42,7 @@ func (f *Fan) Create(ctx context.Context, fEntity *entity.Fan) (*entity.Fan, err
 		Name:  fModel.Name,
 		Email: fModel.Email,
 		Team: &entity.Team{
-			ID:   int(team.ID),
+			ID:   team.ID,
 			UID:  team.UID,
 			Name: team.Name,
 		},

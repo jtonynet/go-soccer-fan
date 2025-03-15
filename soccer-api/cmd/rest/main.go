@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository/gormrepo"
@@ -12,13 +14,27 @@ func main() {
 	cfg := config.LoadConfig()
 
 	gormConn := database.NewGormCom(cfg.Database)
-	championshipRepo := gormrepo.NewChampionship(gormConn)
+	competitionRepo := gormrepo.NewCompetition(gormConn)
 	fanRepo := gormrepo.NewFan(gormConn)
 
-	championshipService := service.NewChampionship(championshipRepo)
+	competitionService := service.NewCompetition(competitionRepo)
 	fanService := service.NewFan(fanRepo)
 
-	err := routes.NewGinRoutes(championshipService, fanService).Run()
+	// TODO: mover para cmd/scheduler/main OU cmd/cli/main
+	cli := false
+	if cli {
+		teamRepo := gormrepo.NewTeam(gormConn)
+		matchRepo := gormrepo.NewMatch(gormConn)
+		dataFetchService := service.NewDataFetchService(
+			cfg.ExternalApi,
+			competitionRepo,
+			teamRepo,
+			matchRepo,
+		)
+		dataFetchService.FetchAndStore(context.Background())
+	}
+
+	err := routes.NewGinRoutes(competitionService, fanService).Run()
 	if err != nil {
 		panic("cant initiate routes")
 	}
