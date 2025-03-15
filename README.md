@@ -106,7 +106,7 @@ A `REST` `API` deve responder no caminho `http://localhost:8080`
 <a id="import-data"></a>
 #### ⚽ Importando Campeonatos
 
-Assim que iniciada, a database da `API` não possui dados de campeonatos. Para essas informações, não utilizaremos `seeds` clássicos. Nossa abordagem será a utilização de um `CLI` que importa esses dados da `API` externa. Para isso, execute o seguinte comando:
+Assim que iniciada, a database da `API` não possui dados de campeonatos. A importação dessas informações é realizada por meio de um `CLI` que obtém os dados da `API` externa. Para isso, com o projeto rodando, execute o seguinte comando:
 
 ```bash
 docker exec -ti soccer-api-cli /usr/src/app/bin/cli/main import competitions
@@ -117,7 +117,7 @@ Saída esperada (rodando no terminal do VScode):
     <img src="./docs/assets/images/layout/screen-captures/cli_import_data_vscode_terminal.png">
 </div>
 
-Essa mesma abordagem pode ser utilizada em produção em um `CronJob`, `RunDeck` ou outros serviços de tarefas agendadas para que os dados sejam atualizados periodicamente.
+Isso facilita o uso de `CronJob`, `RunDeck` ou outros serviços de tarefas agendadas para que os dados sejam atualizados periodicamente.
 
 <br/>
 

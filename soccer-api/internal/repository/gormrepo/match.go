@@ -37,6 +37,7 @@ func (m *Match) CreateOrUpdateInBatch(ctx context.Context, mEntities []*entity.M
 			UID:           e.UID,
 			ExternalId:    e.ExternalID,
 			CompetitionID: e.CompetitionID,
+			Round:         e.Round,
 			HomeTeamID:    e.HomeTeam.ID,
 			AwayTeamID:    e.AwayTeam.ID,
 		})
@@ -56,6 +57,8 @@ func (m *Match) CreateOrUpdateInBatch(ctx context.Context, mEntities []*entity.M
 			ID:            mModel.ID,
 			UID:           mModel.UID,
 			ExternalID:    mModel.ExternalId,
+			CompetitionID: mModel.CompetitionID,
+			Round:         mModel.Round,
 			HomeTeamScore: mModel.HomeTeamScore,
 			AwayTeamScore: mModel.AwayTeamScore,
 			HomeTeam:      teamEntityMap[mModel.HomeTeamID],

@@ -42,12 +42,26 @@ services:
       SMTP_USER: user@soccerfan.com
       SMTP_PASSWORD: pwd
       EMAILS_FROM_EMAIL: noreply@soccerfan.com
-      SMTP_PORT: 1025                        # 1025 | 465
-      SMTP_HOST: todo-stunnel
+      SMTP_PORT: 465
+      SMTP_HOST: stunnel
       EMAILS_FROM_NAME: No reply
       MAIL_TLS: true
     networks:
       - network
+
+   # Proxy to add TLS encryption on development env, because gomail needs TLS
+  stunnel:
+   image: dweomer/stunnel
+   restart: always
+   environment:
+     - STUNNEL_SERVICE=smtps
+     - STUNNEL_ACCEPT=465
+     - STUNNEL_CONNECT=mailhog:1025
+   networks:
+     - network
+   ports:
+     - 465:465
+
 
   api-rest:
     build:
