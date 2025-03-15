@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+## [0.0.8] - 2025-15-03
+### Added
+- [Issue 7](https://github.com/jtonynet/go-soccer-fan/issues/7)
+  - Adicionada `CLI` para consumo de `API externa`
+
 ## [0.0.7] - 2025-15-03
 ### Added
 - [Issue 6](https://github.com/jtonynet/go-soccer-fan/issues/6)
@@ -56,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Documentação base: Readme Rico, ADRs: [0001: Registro de Decisões de Arquitetura (ADR)](./docs/architecture/decisions/registro-de-decisoes-de-arquitetura.md) e [0002: Go, Gin, Gorm e PostgreSQL com Arquitetura Três Camadas e TDD](./docs/architecture/decisions/0002-go-gin-gorm-e-postgres-com-arquitetura-tres-camadas-e-tdd.md).
   - Sabemos o que fazer, graças às definições do arquivo __README.md__. Sabemos como fazer graças aos __ADRs__ e documentações vinculadas. Devemos nos organizar em estrutura __Kanban__, guiados pelo modelo Agile, em nosso __Github Project__, e dar o devido prosseguimento às tarefas.
 
+[0.0.8]: https://github.com/jtonynet/go-soccer-fan/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/jtonynet/go-soccer-fan/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/jtonynet/go-soccer-fan/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/jtonynet/go-soccer-fan/compare/v0.0.4...v0.0.5

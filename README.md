@@ -42,6 +42,7 @@ __[Go Soccer Fan](#header)__<br/>
   3.  💻 [Rodando o Projeto](#run)
       - 🌐 [Ambiente](#environment)
       - 🐋 [Conteinerizado](#run-containerized)
+      - ⚽ [Importando Campeonatos](#import-data)
   4.  ✅ [Testes](#tests)
   5.  🧠 [ADR - Architecture Decision Records](#adr)
   6.  🔢 [Versões](#versions)
@@ -97,6 +98,21 @@ docker compose up
 ```
 
 A `REST` `API` deve responder no caminho `http://localhost:8080`
+
+<br/>
+<div align="center">. . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+<br/>
+
+<a id="import-data"></a>
+#### ⚽ Importando Campeonatos
+
+Assim que iniciada, a database da `API` não possui dados de campeonatos. Para essas informações, não utilizaremos `seeds` clássicos. Nossa abordagem será a utilização de um `CLI` que importa esses dados da `API` externa. Para isso, execute o seguinte comando:
+
+```bash
+docker exec -ti soccer-cli /usr/src/app/bin/cli/main import competitions
+```
+
+Essa mesma abordagem pode ser utilizada em produção em um `CronJob`, `RunDeck` ou outros serviços de tarefas agendadas para que os dados sejam atualizados periodicamente.
 
 <br/>
 
