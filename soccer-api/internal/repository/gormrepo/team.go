@@ -2,7 +2,6 @@ package gormrepo
 
 import (
 	"context"
-	"errors"
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/entity"
@@ -23,8 +22,7 @@ func NewTeam(gConn *database.GormConn) *Team {
 
 func (t *Team) CreateOrUpdateInBatch(ctx context.Context, aEntities []*entity.Team) ([]*entity.Team, error) {
 	if len(aEntities) == 0 {
-		//return nil, nil
-		return nil, errors.New("list of entities is empty")
+		return nil, nil
 	}
 
 	var tModels []model.Team

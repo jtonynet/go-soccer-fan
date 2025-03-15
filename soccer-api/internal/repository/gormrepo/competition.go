@@ -82,7 +82,6 @@ func (c *Competition) FindMatchsByCompetitionUID(ctx context.Context, uid uuid.U
 func (c *Competition) CreateOrUpdateInBatch(ctx context.Context, cEntities []*entity.Competition) ([]*entity.Competition, error) {
 	if len(cEntities) == 0 {
 		return nil, nil
-		// return nil, errors.New("list of entities is empty")
 	}
 
 	var cModels []model.Competition
