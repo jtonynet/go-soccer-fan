@@ -13,11 +13,15 @@ type ginRoutes struct {
 	engine *gin.Engine
 }
 
-func NewGinRoutes(cService *service.Competition, fService *service.Fan) *ginRoutes {
+func NewGinRoutes(
+	competitionService *service.Competition,
+	fanService *service.Fan,
+	broadcastService *service.EmailService,
+) *ginRoutes {
 	e := gin.Default()
 
 	e.GET("/campeonatos", func(c *gin.Context) {
-		result, _ := cService.FindAll()
+		result, _ := competitionService.FindAll()
 		c.JSON(http.StatusOK, result)
 	})
 
@@ -30,7 +34,7 @@ func NewGinRoutes(cService *service.Competition, fService *service.Fan) *ginRout
 			return
 		}
 
-		result, err := cService.FindMatchsByCompetitionUID(uid)
+		result, err := competitionService.FindMatchsByCompetitionUID(uid)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"erro": "erro interno, tente novamente mais tarde",
@@ -50,7 +54,7 @@ func NewGinRoutes(cService *service.Competition, fService *service.Fan) *ginRout
 
 		// TODO: VALIDATES DTO IN FUTURE
 
-		fResp, err := fService.Create(&fReq)
+		fResp, err := fanService.Create(&fReq)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"erro": "erro interno, tente novamente mais tarde",
@@ -59,6 +63,29 @@ func NewGinRoutes(cService *service.Competition, fService *service.Fan) *ginRout
 		}
 
 		c.JSON(http.StatusAccepted, fResp)
+	})
+
+	e.POST("/broadcast", func(c *gin.Context) {
+		var bReq dto.BroadcastSendRequest
+		if err := c.ShouldBindJSON(&bReq); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"erro": "corpo da requisição inválido",
+			})
+			return
+		}
+
+		// TODO: VALIDATES DTO IN FUTURE
+
+		bResp, err := broadcastService.Notify(&bReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"erro": "erro interno, tente novamente mais tarde",
+			})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, bResp)
+
 	})
 
 	return &ginRoutes{

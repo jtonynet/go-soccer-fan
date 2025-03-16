@@ -178,11 +178,19 @@ func TestGinRoutesSuite(t *testing.T) {
 
 func (suite *ginRoutesSuite) SetupSuite() {
 	fDB := NewFakeDB()
+
 	fakeCRepo := NewFakeCompetitionRepo(fDB)
 	fakeFRepo := NewFakeFanRepo(fDB)
+
 	cService := service.NewCompetition(fakeCRepo)
 	fService := service.NewFan(fakeFRepo)
-	suite.r = NewGinRoutes(cService, fService)
+	nService := &service.EmailService{}
+
+	suite.r = NewGinRoutes(
+		cService,
+		fService,
+		nService, // TODO
+	)
 }
 
 func (suite *ginRoutesSuite) TestGetChampionshipsSuccesfully() {

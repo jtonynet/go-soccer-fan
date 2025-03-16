@@ -1,10 +1,14 @@
 package service
 
 import (
+	"context"
 	"crypto/tls"
+	"fmt"
 	"log"
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/dto"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository"
 	"gopkg.in/gomail.v2"
 )
 
@@ -16,11 +20,16 @@ type EmailService struct {
 	From     string
 	FromName string
 	UseTLS   bool
+
+	teamRepo repository.Team
 }
 
 var isDevelopmentEnv = true
 
-func NewEmailService(cfg *config.MailNotification) *EmailService {
+func NewEmailBroadcast(
+	cfg *config.MailNotification,
+	teamRepo repository.Team,
+) *EmailService {
 
 	isDevelopmentEnv = cfg.IsDevelopmentEnv
 
@@ -32,10 +41,31 @@ func NewEmailService(cfg *config.MailNotification) *EmailService {
 		From:     cfg.EmailFromEmail,
 		FromName: cfg.EmailFromName,
 		UseTLS:   cfg.UseMailTLS,
+
+		teamRepo: teamRepo,
 	}
 }
 
-func (es *EmailService) SendEmail(to string, subject string, body string) error {
+func (es *EmailService) Notify(bReq *dto.BroadcastSendRequest) (*dto.BroadcastResponse, error) {
+	fanEntities, err := es.teamRepo.FindFansByTeamName(context.Background(), bReq.Team)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	for _, fan := range fanEntities {
+		es.sendEmail(
+			fan.Email,
+			fmt.Sprintf("%s da partida do: %s", bReq.Type, bReq.Team),
+			bReq.Message,
+		)
+	}
+
+	return &dto.BroadcastResponse{
+		Message: "processando notificações",
+	}, nil
+}
+
+func (es *EmailService) sendEmail(to string, subject string, body string) error {
 	m := gomail.NewMessage()
 
 	m.SetHeader("From", es.From)
