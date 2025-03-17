@@ -43,6 +43,7 @@ __[Go Soccer Fan](#header)__<br/>
       - 🌐 [Ambiente](#environment)
       - 🐋 [Conteinerizado](#run-containerized)
       - ⚽ [Importando Campeonatos](#import-data)
+      - ✍️ [Endpoints e Uso](#run-use)
   4.  ✅ [Testes](#tests)
   5.  🧠 [ADR - Architecture Decision Records](#adr)
   6.  🔢 [Versões](#versions)
@@ -97,6 +98,11 @@ A seguir, rode o comandos `docker compose` (de acordo com sua versão do docker 
 docker compose up
 ```
 
+Aguarde até que `api-rest` esteja funcional, exibindo uma mensagem semelhante à seguinte em seu terminal (as dependências podem demorar um pouco devido à instalação inicial):
+```bash
+api-rest-1 | 2025/03/17 19:17:38 stdout: [GIN-debug] Listening and serving HTTP on :8080
+```
+
 A `REST` `API` deve responder no caminho `http://localhost:8080`
 
 <br/>
@@ -123,7 +129,9 @@ Isso facilita o uso de `CronJob`, `RunDeck` ou outros serviços de tarefas agend
 <div align="center">. . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
 <br/>
 
-#### ✍️ Endpoints e Validações
+<a id="run-use"></a>
+#### ✍️ Endpoints e Uso
+
 Uma vez importados os campeonatos e com o projeto em execução, os endpoints e ações vinculados a seguir estarão disponíveis. Esses endpoints podem ser _validados_ via [`Postman`](https://www.postman.com/), [`Insomnia`](https://insomnia.rest/) ou quaisquer clientes `REST` `HTTP`.
 
 1. `GET` `http://localhost:8080/campeonatos`
@@ -229,6 +237,7 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
 6. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/) captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do broadcast.
    - Tela do `Mailhog`
       - <img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png">
+      -  Caso os emails nao aparecem imediatamente após o endpoint de `broadcast` ter respondido com `status-code` `202` e com ` "mensagem": "Notificação enviada"` clique no botao de refresh `🔄` do `Mailhog`
 
 
 <br/>
