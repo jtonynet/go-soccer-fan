@@ -16,7 +16,7 @@ type ginRoutes struct {
 func NewGinRoutes(
 	competitionService *service.Competition,
 	fanService *service.Fan,
-	broadcastService *service.EmailService,
+	broadcastService *service.Broadcast,
 ) *ginRoutes {
 	e := gin.Default()
 
@@ -76,7 +76,7 @@ func NewGinRoutes(
 
 		// TODO: VALIDATES DTO IN FUTURE
 
-		bResp, err := broadcastService.Notify(&bReq)
+		bResp, err := broadcastService.Send(&bReq)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"erro": "erro interno, tente novamente mais tarde",

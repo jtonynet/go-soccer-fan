@@ -20,6 +20,15 @@ type ExternalApi struct {
 	Token string
 }
 
+type RabbitMQ struct {
+	Host                  string
+	User                  string
+	Password              string
+	Port                  string
+	MatchNoticationsQueue string
+	FanNotificationsQueue string
+}
+
 type MailNotification struct {
 	SMTPHost         string
 	SMTPPort         int
@@ -34,6 +43,7 @@ type MailNotification struct {
 type Config struct {
 	Database         *Database
 	ExternalApi      *ExternalApi
+	RabbitMQ         *RabbitMQ
 	MailNotification *MailNotification
 }
 
@@ -65,6 +75,14 @@ func LoadConfig() *Config {
 		ExternalApi: &ExternalApi{
 			URL:   os.Getenv("EXTERNAL_API_URL"),
 			Token: os.Getenv("EXTERNAL_API_TOKEN"),
+		},
+		RabbitMQ: &RabbitMQ{
+			User:                  os.Getenv("RABBITMQ_USER"),
+			Password:              os.Getenv("RABBITMQ_PASS"),
+			Port:                  os.Getenv("RABBITMQ_PORT"),
+			Host:                  os.Getenv("RABBITMQ_HOST"),
+			MatchNoticationsQueue: os.Getenv("RABBITMQ_QUEUE_MATCH_NOTIFICATIONS"),
+			FanNotificationsQueue: os.Getenv("RABBITMQ_QUEUE_FAN_MATCH_NOTIFICATIONS"),
 		},
 		MailNotification: &MailNotification{
 			SMTPHost:         os.Getenv("MAIL_NOTIFICATION_SMTP_HOST"),

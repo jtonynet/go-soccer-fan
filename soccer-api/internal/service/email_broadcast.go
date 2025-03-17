@@ -53,6 +53,15 @@ func (es *EmailService) Notify(bReq *dto.BroadcastSendRequest) (*dto.BroadcastRe
 	}
 
 	for _, fan := range fanEntities {
+
+		// body := fmt.Sprintf("Time: %s, Tipo: %s, Placar: %s, Mensagem: %s", fan.Team, bReq.Type, bReq.Score, bReq.Message)
+		// err := es.rabbitMQ.Publish("broadcast_queue", body)
+		// if err != nil {
+		// 	log.Println("não foi possível publicar a mensagem")
+		// } else {
+		// 	log.Println("FOI PRA FILA MANO")
+		// }
+
 		es.sendEmail(
 			fan.Email,
 			fmt.Sprintf("%s da partida do: %s", bReq.Type, bReq.Team),

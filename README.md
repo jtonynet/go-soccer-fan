@@ -323,4 +323,7 @@ ALTER SEQUENCE public.fans_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.matches_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.teams_id_seq RESTART WITH 1;
 
+mailhog: http://localhost:8025/
+rabbitMQ: http://localhost:15672/ - admin-admin
+
 -->

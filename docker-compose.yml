@@ -31,6 +31,25 @@ services:
     networks:
       - network
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: soccer-rabbitmq
+    hostname: soccer-rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 15s
+      retries: 5
+    networks:
+      - network
+
+
   mailhog:
     container_name: soccer-mailhog
     hostname: soccer-mailhog
@@ -62,7 +81,6 @@ services:
    ports:
      - 465:465
 
-
   api-rest:
     build:
       context: ./soccer-api
@@ -77,6 +95,7 @@ services:
       - network
     depends_on:
       - postgres
+      - rabbitmq
       - mailhog
     command: CompileDaemon -build="go build -o /usr/src/app/bin/rest/main /usr/src/app/cmd/rest/main.go" -command="./bin/rest/main"
 

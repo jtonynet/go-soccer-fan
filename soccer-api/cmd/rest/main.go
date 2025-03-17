@@ -1,8 +1,11 @@
 package main
 
 import (
+	"log"
+
 	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/rabbitmq"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository/gormrepo"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/routes"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/service"
@@ -18,13 +21,15 @@ func main() {
 	competitionService := service.NewCompetition(competitionRepo)
 	fanService := service.NewFan(fanRepo)
 
-	teamRepo := gormrepo.NewTeam(gormConn)
-	broadcastService := service.NewEmailBroadcast(
-		cfg.MailNotification,
-		teamRepo,
-	)
+	pubSub, err := rabbitmq.NewRabbitMQ(cfg.RabbitMQ)
+	if err != nil {
+		log.Fatalf("can't instantiate pubsub: %v", err)
+	}
 
-	err := routes.NewGinRoutes(
+	teamRepo := gormrepo.NewTeam(gormConn)
+	broadcastService := service.NewBroadcast(pubSub, teamRepo, cfg.RabbitMQ.MatchNoticationsQueue)
+
+	err = routes.NewGinRoutes(
 		competitionService,
 		fanService,
 		broadcastService,

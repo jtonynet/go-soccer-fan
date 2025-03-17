@@ -58,6 +58,21 @@ func (t *Team) CreateOrUpdateInBatch(ctx context.Context, aEntities []*entity.Te
 	return result, nil
 }
 
+func (t *Team) FindByTeamName(ctx context.Context, tName string) (*entity.Team, error) {
+	var tModel *model.Team
+	if err := t.db.WithContext(ctx).Where("name = ?", tName).First(&tModel).Error; err != nil {
+		return nil, fmt.Errorf("team not found: %s", tName)
+	}
+
+	return &entity.Team{
+		ID:         tModel.ID,
+		UID:        tModel.UID,
+		ExternalID: tModel.ExternalId,
+		Name:       tModel.Name,
+		FullName:   tModel.FullName,
+	}, nil
+}
+
 func (t *Team) FindFansByTeamName(ctx context.Context, tName string) ([]*entity.Fan, error) {
 	var tModel *model.Team
 	if err := t.db.WithContext(ctx).Where("name = ?", tName).First(&tModel).Error; err != nil {

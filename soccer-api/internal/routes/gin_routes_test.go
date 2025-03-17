@@ -184,7 +184,7 @@ func (suite *ginRoutesSuite) SetupSuite() {
 
 	cService := service.NewCompetition(fakeCRepo)
 	fService := service.NewFan(fakeFRepo)
-	nService := &service.EmailService{}
+	nService := &service.Broadcast{}
 
 	suite.r = NewGinRoutes(
 		cService,
