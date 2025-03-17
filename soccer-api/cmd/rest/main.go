@@ -5,7 +5,7 @@ import (
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
-	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/rabbitmq"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/pubsub"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository/gormrepo"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/routes"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/service"
@@ -21,7 +21,7 @@ func main() {
 	competitionService := service.NewCompetition(competitionRepo)
 	fanService := service.NewFan(fanRepo)
 
-	pubSub, err := rabbitmq.NewRabbitMQ(cfg.RabbitMQ)
+	pubSub, err := pubsub.NewRabbitMQ(cfg.RabbitMQ)
 	if err != nil {
 		log.Fatalf("can't instantiate pubsub: %v", err)
 	}

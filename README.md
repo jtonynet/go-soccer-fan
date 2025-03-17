@@ -120,6 +120,117 @@ Saída esperada (rodando no terminal do VScode):
 Isso facilita o uso de `CronJob`, `RunDeck` ou outros serviços de tarefas agendadas para que os dados sejam atualizados periodicamente.
 
 <br/>
+<div align="center">. . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+<br/>
+
+#### ✍️ Endpoints e Validações
+Uma vez importados os campeonatos e com o projeto em execução, os endpoints e ações vinculados a seguir estarão disponíveis. Esses endpoints podem ser _validados_ via [`Postman`](https://www.postman.com/), [`Insomnia`](https://insomnia.rest/) ou quaisquer clientes `REST` `HTTP`.
+
+1. `GET` `http://localhost:8080/campeonatos`
+   - Lista Campeonatos disponíveis
+   - `Response body:`
+        > ```json
+        > {
+        >   "campeonatos": [
+        >     {
+        >       "id": "ff8180b9-b039-4019-a107-b049271a58d5",
+        >       "nome": "Campeonato Brasileiro Série A",
+        >       "temporada": "2025"
+        >     },
+        >     {
+        >       "id": "194fcf9e-d373-4da6-bf66-96f5de4ae87b",
+        >       "nome": "Championship",
+        >       "temporada": "2025"
+        >     }
+        > }
+        > ```
+
+<br/>
+
+2. `GET` `http://localhost:8080/campeonatos/{ID_CAMPEONATO}/partidas`
+   - Lista Partidas disponíveis por rodada de um campeonato onde `{ID_CAMPEONATO}` é um id de campeonato da listagem do `endpoint` anterior
+   - `Response body:`
+        > ```json
+        > {
+        >   "rodadas": [
+        >     {
+        >       "rodada": 13,
+        >       "partidas": [
+        >         {
+        >           "time_casa": "Flamengo",
+        >           "time_fora": "São Paulo",
+        >           "placar": "-"
+        >         }
+        >       ]
+        >     }
+        >   ]
+        > }
+        > ```
+
+<br/>
+
+3.  `POST` `http://localhost:8080/torcedores`
+   - Cria um torcedor vinculado a um Time onde o campo `time` do `request body` deve ser obrigatoriamente igual ao nome de qualquer time que participe de algum campeonato
+     - `Request body:`
+        > ```json
+        > {
+        >   "nome": "Jonh Doe",
+        >   "email": "jonhdoe@example.com",
+        >   "time": "Flamengo"
+        > }
+        > ```
+     - `Response body:`
+        > ```json
+        > {
+        >     "id": "94383573-f0d5-4aa5-9e98-75de547ef39e",
+        >     "nome": "Jonh Doe",
+        >     "email": "jonhdoe@example.com",
+        >     "time": "Flamengo",
+        >     "mensagem": "Cadastro realizado com sucesso"
+        > }
+        > ```
+
+<br/>
+
+1. `POST` `http://localhost:8080/broadcast`
+   - Faz `broadcast` para todos os `torcedores` do time informado no campo `time` do `request body`, enviando a `mensagem` informada tendo por título a ação do campo `tipo`. Essas mensagens hoje sao enviadas exclusivamente por email (campo que possuímos no cadastro) podendo ser estendidas a outros tipos de notificações no futuro
+   - `Request body:`
+        > ```json
+        > {
+        >  "tipo": "fim",
+        >  "time": "Flamengo",
+        >  "placar": "7-1",
+        >  "mensagem": "O jogo terminou com placar 7-1"
+        > }
+        > ```
+   - `Response body:`
+        > ```json
+        > {
+        >     "mensagem": "Notificação enviada"
+        > }
+        > ```
+
+<br/>
+
+5. O `client` do `RabbitMQ` pode ser acessado na url: [http://localhost:15672/](http://localhost:15672/) (user: admin, senha: admin) com duas filas disponiveis para a aplicação
+   - `MATCH_NOTIFICATIONS` 
+     - Produtor: `api-rest` - Produz UMA notificação de `broadcast` (a mesma do `request body` do endpoint anterior)
+     - Consumidor: `matchworker` - Consome a notificação do time e produz uma mensagem para cada torcedor para `FAN_NOTIFICATIONS`
+   - `FAN_NOTIFICATIONS` 
+     - Produtor: `matchworker` - Explicado anteriormente como `Consumidor` do item anterior
+     - Consumidor: `fanworker` - Consome a notificação dos torcedores e para cada uma faz o envio de um `email` com o campo `mensagam` do `request body` do endpoint `broadcast`
+    - Dessa maneira a `api-rest` delega responsabilidade de envio para uma arquitetura resiliente que pode ser facilmente escalada e as mensagens não enviadas podem cair em uma `Dead Letter Queue` para auditorias
+      - <img src="./docs/assets/images/layout/screen-captures/rabbitmq_client_browser.png">
+
+
+<br/>
+
+6. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/) captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do broadcast.
+   - Tela do `Mailhog`
+      - <img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png">
+
+
+<br/>
 
 [⤴️ de volta ao índice](#index)
 
@@ -291,6 +402,15 @@ Este desafio me permite consolidar conhecimentos e identificar pontos cegos para
 </div>
 
 <!-- 
+
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+docker rmi $(docker images -q) --force
+docker volume rm $(docker volume ls -q) --force
+docker network prune -f
+docker system prune -a --volumes
+
+sudo systemctl restart docker
 
 #TEST SEEDER
 

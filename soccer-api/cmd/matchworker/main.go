@@ -9,9 +9,8 @@ import (
 	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/dto"
-	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/rabbitmq"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/pubsub"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository/gormrepo"
-	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/service"
 	"github.com/streadway/amqp"
 )
 
@@ -20,15 +19,14 @@ func main() {
 
 	gormConn := database.NewGormCom(cfg.Database)
 	teamRepo := gormrepo.NewTeam(gormConn)
-	mailService := service.NewMail(cfg.MailNotification)
 
-	rabbitMQ, err := rabbitmq.NewRabbitMQ(cfg.RabbitMQ)
+	pubSub, err := pubsub.NewRabbitMQ(cfg.RabbitMQ)
 	if err != nil {
 		log.Fatalf("failed to connect to RabbitMQ: %v", err)
 	}
-	defer rabbitMQ.Close()
+	defer pubSub.Close()
 
-	err = rabbitMQ.Subscribe(cfg.RabbitMQ.MatchNoticationsQueue, func(d amqp.Delivery) {
+	err = pubSub.Subscribe(cfg.RabbitMQ.MatchNoticationsQueue, func(d amqp.Delivery) {
 		var bReq dto.BroadcastSendRequest
 		err := json.Unmarshal(d.Body, &bReq)
 		if err != nil {
@@ -40,13 +38,31 @@ func main() {
 			return
 		}
 
+		score := "-"
+		if bReq.Score != "" {
+			score = bReq.Score
+		}
+
 		fanEntities, _ := teamRepo.FindFansByTeamName(context.Background(), bReq.Team)
 		for _, fan := range fanEntities {
-			mailService.SendMail(
-				fan.Email,
-				fmt.Sprintf("%s da partida do: %s", bReq.Type, bReq.Team),
-				bReq.Message,
-			)
+			fanNotification := &dto.FanNotification{
+				FanUID:   fan.UID,
+				FanEmail: fan.Email,
+				Title:    fmt.Sprintf("%s da partida do: %s", bReq.Type, bReq.Team),
+				Team:     bReq.Team,
+				Score:    score,
+				Message:  bReq.Message,
+			}
+
+			fNotify, err := json.Marshal(fanNotification)
+			if err != nil {
+				log.Printf("error converting struct to string: %v\n", err)
+			}
+
+			err = pubSub.Publish(cfg.RabbitMQ.FanNotificationsQueue, string(fNotify))
+			if err != nil {
+				log.Printf("error publishing fan notification: %v\n", err)
+			}
 		}
 
 		if ackErr := d.Ack(false); ackErr != nil {

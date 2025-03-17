@@ -1,9 +1,11 @@
-package rabbitmq
+package pubsub
 
 import (
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/cenkalti/backoff"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
 	"github.com/streadway/amqp"
 )
@@ -21,7 +23,22 @@ func NewRabbitMQ(cfg *config.RabbitMQ) (*RabbitMQ, error) {
 
 	connStr := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, password, host, port)
 
-	conn, err := amqp.Dial(connStr)
+	var conn *amqp.Connection
+	operation := func() error {
+		var err error
+		conn, err = amqp.Dial(connStr)
+		if err != nil {
+			log.Printf("RabbitMQ off: %v. retriyng...", err)
+			return err
+		}
+		return nil
+	}
+
+	expBackoff := backoff.NewExponentialBackOff()
+	expBackoff.InitialInterval = 2 * time.Second
+	expBackoff.MaxElapsedTime = 2 * time.Minute
+
+	err := backoff.Retry(operation, expBackoff)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 	}

@@ -7,17 +7,17 @@ import (
 	"log"
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/dto"
-	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/rabbitmq"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/pubsub"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository"
 )
 
 type Broadcast struct {
-	pubSub   *rabbitmq.RabbitMQ
+	pubSub   *pubsub.RabbitMQ
 	teamRepo repository.Team
 	queue    string
 }
 
-func NewBroadcast(pubsub *rabbitmq.RabbitMQ, teamRepo repository.Team, queue string) *Broadcast {
+func NewBroadcast(pubsub *pubsub.RabbitMQ, teamRepo repository.Team, queue string) *Broadcast {
 	return &Broadcast{pubsub, teamRepo, queue}
 }
 
@@ -35,5 +35,7 @@ func (b *Broadcast) Publish(bReq *dto.BroadcastSendRequest) (*dto.BroadcastRespo
 
 	b.pubSub.Publish(b.queue, string(bReqStr))
 
-	return nil, nil
+	return &dto.BroadcastResponse{
+		Message: "Notificação enviada",
+	}, nil
 }

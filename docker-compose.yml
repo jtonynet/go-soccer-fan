@@ -15,11 +15,11 @@ services:
     container_name: soccer-postgres
     hostname: soccer-postgres
     environment:
-      POSTGRES_USER: api_user
-      POSTGRES_PASSWORD: api_pwd
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: soccer_db_dev
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U api_user -d soccer_db_dev" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d soccer_db_dev" ]
       interval: 2s
       timeout: 5s
       retries: 5
@@ -45,7 +45,7 @@ services:
       test: [ "CMD", "rabbitmqctl", "status"]
       interval: 5s
       timeout: 15s
-      retries: 5
+      retries: 10
     networks:
       - network
 
@@ -65,6 +65,11 @@ services:
       SMTP_HOST: stunnel
       EMAILS_FROM_NAME: No reply
       MAIL_TLS: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8025"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - network
 
@@ -78,6 +83,11 @@ services:
      - STUNNEL_CONNECT=mailhog:1025
    networks:
      - network
+   healthcheck:
+     test: ["CMD", "curl", "--insecure", "--fail", "https://localhost:465"]
+     interval: 30s
+     timeout: 10s
+     retries: 3
    ports:
      - 465:465
 
@@ -96,9 +106,31 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+      - api-match-worker
+      - api-fan-worker
     command: CompileDaemon -build="go build -o /usr/src/app/bin/rest/main /usr/src/app/cmd/rest/main.go" -command="./bin/rest/main"
 
   api-match-worker:
+    deploy:
+      replicas: 1
+    build:
+      context: ./soccer-api
+      dockerfile: Dockerfile
+    env_file:
+      - ./soccer-api/.env
+    volumes:
+      - ./soccer-api:/usr/src/app
+    networks:
+      - network
+    depends_on:
+      - postgres
+      - rabbitmq
+      - api-fan-worker
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/matchworker/main /usr/src/app/cmd/matchworker/main.go" -command="./bin/matchworker/main"
+
+  api-fan-worker:
+    deploy:
+      replicas: 2
     build:
       context: ./soccer-api
       dockerfile: Dockerfile
@@ -112,7 +144,8 @@ services:
       - postgres
       - rabbitmq
       - mailhog
-    command: CompileDaemon -build="go build -o /usr/src/app/bin/matchworker/main /usr/src/app/cmd/matchworker/main.go" -command="./bin/matchworker/main"
+      - stunnel 
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/fanworker/main /usr/src/app/cmd/fanworker/main.go" -command="./bin/fanworker/main"
 
   api-cli:
     container_name: soccer-api-cli
