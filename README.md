@@ -142,6 +142,7 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
         >       "nome": "Championship",
         >       "temporada": "2025"
         >     }
+        >   ]
         > }
         > ```
 
@@ -192,7 +193,7 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
 
 <br/>
 
-1. `POST` `http://localhost:8080/broadcast`
+4. `POST` `http://localhost:8080/broadcast`
    - Faz `broadcast` para todos os `torcedores` do time informado no campo `time` do `request body`, enviando a `mensagem` informada tendo por título a ação do campo `tipo`. Essas mensagens hoje sao enviadas exclusivamente por email (campo que possuímos no cadastro) podendo ser estendidas a outros tipos de notificações no futuro
    - `Request body:`
         > ```json
