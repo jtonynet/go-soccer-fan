@@ -134,7 +134,31 @@ Isso facilita o uso de `CronJob`, `RunDeck` ou outros serviços de tarefas agend
 
 Uma vez importados os campeonatos e com o projeto em execução, os endpoints e ações vinculados a seguir estarão disponíveis. Esses endpoints podem ser _validados_ via [`Postman`](https://www.postman.com/), [`Insomnia`](https://insomnia.rest/) ou quaisquer clientes `REST` `HTTP`.
 
-1. `GET` `http://localhost:8080/campeonatos`
+1. `POST` `http://localhost:8080/user`
+    - Cria um usuário administrativo (rota aberta por simplicidade. Em um sistema real, essa rota deve ser protegida e interna, não sendo exposta ao público em geral ou acessível diretamente, mas sim proveniente de outro sistema de autenticação).
+     - `Request body:`
+        > ```json
+        > {
+        > 	"username": "admin",
+        > 	"password": "admin",
+        > 	"name": "admin",
+        > 	"email": "admin@admin.com"
+        > }
+        > ```
+     - `Response body:`
+        > ```json
+        > {
+        >     "UID": "7de7a50e-df58-467c-8f9e-f7f5498d37ad",
+        >     "UserName": "admin",
+        >     "Name": "admin",
+        >     "Email": "admin@admin.com"
+        > }
+        > ```
+
+
+<br/>
+
+2. `GET` `http://localhost:8080/campeonatos`
    - Lista Campeonatos disponíveis
    - `Response body:`
         > ```json
@@ -228,7 +252,7 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
 
 <br/>
 
-1. O `client` do `RabbitMQ` pode ser acessado na url: [http://localhost:15672/](http://localhost:15672/) (user: admin, senha: admin). Ele possui duas filas disponiveis para a aplicação
+6. O `client` do `RabbitMQ` pode ser acessado na url: [http://localhost:15672/](http://localhost:15672/) (user: admin, senha: admin). Ele possui duas filas disponiveis para a aplicação
    - `MATCH_NOTIFICATIONS` 
      - Produtor: `api-rest` - Produz UMA notificação de `broadcast` (a mesma do `request body` do endpoint anterior)
      - Consumidor: `matchworker` - Consome a notificação do time e produz uma mensagem para cada torcedor para `FAN_NOTIFICATIONS`

@@ -14,11 +14,35 @@ type ginRoutes struct {
 }
 
 func NewGinRoutes(
+	userService *service.User,
 	competitionService *service.Competition,
 	fanService *service.Fan,
 	broadcastService *service.Broadcast,
 ) *ginRoutes {
 	e := gin.Default()
+
+	e.POST("/user", func(c *gin.Context) {
+		var uReq dto.UserCreateRequest
+		if err := c.ShouldBindJSON(&uReq); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"erro": "corpo da requisição inválido",
+			})
+			return
+		}
+
+		// TODO: VALIDATES DTO IN FUTURE
+
+		uResp, err := userService.Create(&uReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"erro": "erro interno, tente novamente mais tarde",
+			})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, uResp)
+
+	})
 
 	e.GET("/campeonatos", func(c *gin.Context) {
 		result, _ := competitionService.FindAll()

@@ -14,7 +14,10 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
-	gormConn := database.NewGormCom(cfg.Database)
+	gormConn, err := database.NewGormCom(cfg.Database)
+	if err != nil {
+		log.Fatalf("can't connect to database: %v", err)
+	}
 
 	competitionRepo := gormrepo.NewCompetition(gormConn)
 	teamRepo := gormrepo.NewTeam(gormConn)

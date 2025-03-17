@@ -14,7 +14,7 @@ type GormConn struct {
 	db *gorm.DB
 }
 
-func NewGormCom(cfg *config.Database) *GormConn {
+func NewGormCom(cfg *config.Database) (*GormConn, error) {
 	dsn := fmt.Sprintf(
 		`host=%s user=%s password=%s dbname=%s port=%s sslmode=%s`,
 		cfg.Host,
@@ -27,7 +27,7 @@ func NewGormCom(cfg *config.Database) *GormConn {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("cannot connect to database: %v", err)
+		return nil, fmt.Errorf("cannot connect to database: %v", err)
 	}
 
 	/*
@@ -35,6 +35,10 @@ func NewGormCom(cfg *config.Database) *GormConn {
 	 removeremos os automigrates e adotaremos o golang migrate
 	 https://github.com/golang-migrate/migrate
 	*/
+	if err := db.AutoMigrate(&model.User{}); err != nil {
+		log.Fatalf("cannot automigrate user: %v", err)
+	}
+
 	if err := db.AutoMigrate(&model.Competition{}); err != nil {
 		log.Fatalf("cannot automigrate competition: %v", err)
 	}
@@ -51,7 +55,7 @@ func NewGormCom(cfg *config.Database) *GormConn {
 		log.Fatalf("cannot automigrate fan: %v", err)
 	}
 
-	return &GormConn{db}
+	return &GormConn{db}, nil
 }
 
 func (gc *GormConn) GetDB() *gorm.DB {

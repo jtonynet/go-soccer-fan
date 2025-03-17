@@ -17,7 +17,11 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
-	gormConn := database.NewGormCom(cfg.Database)
+	gormConn, err := database.NewGormCom(cfg.Database)
+	if err != nil {
+		log.Fatalf("can't connect to database: %v", err)
+	}
+
 	teamRepo := gormrepo.NewTeam(gormConn)
 
 	pubSub, err := pubsub.NewRabbitMQ(cfg.RabbitMQ)

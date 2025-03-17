@@ -14,22 +14,32 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
-	gormConn := database.NewGormCom(cfg.Database)
-	competitionRepo := gormrepo.NewCompetition(gormConn)
-	fanRepo := gormrepo.NewFan(gormConn)
-
-	competitionService := service.NewCompetition(competitionRepo)
-	fanService := service.NewFan(fanRepo)
-
 	pubSub, err := pubsub.NewRabbitMQ(cfg.RabbitMQ)
 	if err != nil {
-		log.Fatalf("can't instantiate pubsub: %v", err)
+		log.Fatalf("can't connect to pubsub: %v", err)
 	}
 
+	gormConn, err := database.NewGormCom(cfg.Database)
+	if err != nil {
+		log.Fatalf("can't connect to database: %v", err)
+	}
+
+	userRepo := gormrepo.NewUser(gormConn)
+	competitionRepo := gormrepo.NewCompetition(gormConn)
+	fanRepo := gormrepo.NewFan(gormConn)
 	teamRepo := gormrepo.NewTeam(gormConn)
-	broadcastService := service.NewBroadcast(pubSub, teamRepo, cfg.RabbitMQ.MatchNoticationsQueue)
+
+	userService := service.NewUser(userRepo)
+	competitionService := service.NewCompetition(competitionRepo)
+	fanService := service.NewFan(fanRepo)
+	broadcastService := service.NewBroadcast(
+		pubSub,
+		teamRepo,
+		cfg.RabbitMQ.MatchNoticationsQueue,
+	)
 
 	err = routes.NewGinRoutes(
+		userService,
 		competitionService,
 		fanService,
 		broadcastService,
