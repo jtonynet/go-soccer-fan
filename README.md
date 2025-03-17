@@ -202,7 +202,7 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
 <br/>
 
 4. `POST` `http://localhost:8080/broadcast`
-   - Faz `broadcast` para todos os `torcedores` do time informado no campo `time` do `request body`, enviando a `mensagem` informada tendo por título a ação do campo `tipo`. Essas mensagens hoje sao enviadas exclusivamente por email (campo que possuímos no cadastro) podendo ser estendidas a outros tipos de notificações no futuro
+   - Faz `broadcast` para todos os `torcedores` do time informado no campo `time` do `request body`, enviando a `mensagem` informada tendo por título a ação do campo `tipo`. Essas mensagens hoje são enviadas exclusivamente por email (campo que possuímos no cadastro) podendo ser estendidas a outros tipos de notificações no futuro
    - `Request body:`
         > ```json
         > {
@@ -221,7 +221,14 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
 
 <br/>
 
-5. O `client` do `RabbitMQ` pode ser acessado na url: [http://localhost:15672/](http://localhost:15672/) (user: admin, senha: admin) com duas filas disponiveis para a aplicação
+5. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/) captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do broadcast.
+   - Tela do `Mailhog`
+      - <img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png">
+      -  Caso os emails não apareçam  imediatamente após o endpoint de `broadcast` ter respondido com `status-code` `202` e com ` "mensagem": "Notificação enviada"` clique no botao de refresh `🔄` do `Mailhog`
+
+<br/>
+
+6. O `client` do `RabbitMQ` pode ser acessado na url: [http://localhost:15672/](http://localhost:15672/) (user: admin, senha: admin) com duas filas disponiveis para a aplicação
    - `MATCH_NOTIFICATIONS` 
      - Produtor: `api-rest` - Produz UMA notificação de `broadcast` (a mesma do `request body` do endpoint anterior)
      - Consumidor: `matchworker` - Consome a notificação do time e produz uma mensagem para cada torcedor para `FAN_NOTIFICATIONS`
@@ -230,15 +237,6 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
      - Consumidor: `fanworker` - Consome a notificação dos torcedores e para cada uma faz o envio de um `email` com o campo `mensagam` do `request body` do endpoint `broadcast`
     - Dessa maneira a `api-rest` delega responsabilidade de envio para uma arquitetura resiliente que pode ser facilmente escalada e as mensagens não enviadas podem cair em uma `Dead Letter Queue` para auditorias
       - <img src="./docs/assets/images/layout/screen-captures/rabbitmq_client_browser.png">
-
-
-<br/>
-
-6. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/) captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do broadcast.
-   - Tela do `Mailhog`
-      - <img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png">
-      -  Caso os emails nao aparecem imediatamente após o endpoint de `broadcast` ter respondido com `status-code` `202` e com ` "mensagem": "Notificação enviada"` clique no botao de refresh `🔄` do `Mailhog`
-
 
 <br/>
 
