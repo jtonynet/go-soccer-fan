@@ -3,7 +3,6 @@ package rabbitmq
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/config"
 	"github.com/streadway/amqp"
@@ -14,11 +13,11 @@ type RabbitMQ struct {
 	Channel *amqp.Channel
 }
 
-func NewRabbitMQ(_ *config.RabbitMQ) (*RabbitMQ, error) {
-	user := os.Getenv("RABBITMQ_USER")
-	password := os.Getenv("RABBITMQ_PASS")
-	host := os.Getenv("RABBITMQ_HOST")
-	port := os.Getenv("RABBITMQ_PORT")
+func NewRabbitMQ(cfg *config.RabbitMQ) (*RabbitMQ, error) {
+	user := cfg.User
+	password := cfg.Password
+	host := cfg.Host
+	port := cfg.Port
 
 	connStr := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, password, host, port)
 
@@ -67,8 +66,43 @@ func (r *RabbitMQ) Publish(queueName string, body string) error {
 		return fmt.Errorf("failed to publish a message: %w", err)
 	}
 
-	log.Printf(" [x] Sent %s", body)
 	return nil
+}
+
+func (r *RabbitMQ) Subscribe(queueName string, handler func(amqp.Delivery)) error {
+	q, err := r.Channel.QueueDeclare(
+		queueName,
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to declare a queue: %w", err)
+	}
+
+	msgs, err := r.Channel.Consume(
+		q.Name,
+		"",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to register a consumer: %w", err)
+	}
+
+	go func() {
+		for d := range msgs {
+			handler(d)
+		}
+	}()
+
+	log.Printf(" [*] Waiting for messages in %s. To exit press CTRL+C", queueName)
+	select {}
 }
 
 func (r *RabbitMQ) Close() {

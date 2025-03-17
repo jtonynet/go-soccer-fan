@@ -21,7 +21,7 @@ func NewBroadcast(pubsub *rabbitmq.RabbitMQ, teamRepo repository.Team, queue str
 	return &Broadcast{pubsub, teamRepo, queue}
 }
 
-func (b *Broadcast) Send(bReq *dto.BroadcastSendRequest) (*dto.BroadcastResponse, error) {
+func (b *Broadcast) Publish(bReq *dto.BroadcastSendRequest) (*dto.BroadcastResponse, error) {
 	_, err := b.teamRepo.FindFansByTeamName(context.Background(), bReq.Team)
 	if err != nil {
 		return nil, fmt.Errorf("team not found: %s", bReq.Team)

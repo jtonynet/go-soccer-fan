@@ -96,8 +96,23 @@ services:
     depends_on:
       - postgres
       - rabbitmq
-      - mailhog
     command: CompileDaemon -build="go build -o /usr/src/app/bin/rest/main /usr/src/app/cmd/rest/main.go" -command="./bin/rest/main"
+
+  api-match-worker:
+    build:
+      context: ./soccer-api
+      dockerfile: Dockerfile
+    env_file:
+      - ./soccer-api/.env
+    volumes:
+      - ./soccer-api:/usr/src/app
+    networks:
+      - network
+    depends_on:
+      - postgres
+      - rabbitmq
+      - mailhog
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/matchworker/main /usr/src/app/cmd/matchworker/main.go" -command="./bin/matchworker/main"
 
   api-cli:
     container_name: soccer-api-cli

@@ -76,7 +76,7 @@ func NewGinRoutes(
 
 		// TODO: VALIDATES DTO IN FUTURE
 
-		bResp, err := broadcastService.Send(&bReq)
+		bResp, err := broadcastService.Publish(&bReq)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"erro": "erro interno, tente novamente mais tarde",
