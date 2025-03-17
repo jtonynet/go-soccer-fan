@@ -2,6 +2,7 @@ package gormrepo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/entity"
@@ -55,4 +56,49 @@ func (t *Team) CreateOrUpdateInBatch(ctx context.Context, aEntities []*entity.Te
 	}
 
 	return result, nil
+}
+
+func (t *Team) FindByTeamName(ctx context.Context, tName string) (*entity.Team, error) {
+	var tModel *model.Team
+	if err := t.db.WithContext(ctx).Where("name = ?", tName).First(&tModel).Error; err != nil {
+		return nil, fmt.Errorf("team not found: %s", tName)
+	}
+
+	return &entity.Team{
+		ID:         tModel.ID,
+		UID:        tModel.UID,
+		ExternalID: tModel.ExternalId,
+		Name:       tModel.Name,
+		FullName:   tModel.FullName,
+	}, nil
+}
+
+func (t *Team) FindFansByTeamName(ctx context.Context, tName string) ([]*entity.Fan, error) {
+	var tModel *model.Team
+	if err := t.db.WithContext(ctx).Where("name = ?", tName).First(&tModel).Error; err != nil {
+		return nil, fmt.Errorf("team not found: %s", tName)
+	}
+
+	var fModels []*model.Fan
+	if err := t.db.WithContext(ctx).Where("team_id = ?", tModel.ID).Find(&fModels).Error; err != nil {
+		return nil, fmt.Errorf("failed to find fans: %w", err)
+	}
+
+	var fEntities []*entity.Fan
+	for _, fModel := range fModels {
+		fEntities = append(fEntities, &entity.Fan{
+			UID:   fModel.UID,
+			Name:  fModel.Name,
+			Email: fModel.Email,
+			Team: &entity.Team{
+				ID:         tModel.ID,
+				UID:        tModel.UID,
+				ExternalID: tModel.ExternalId,
+				Name:       tModel.Name,
+				FullName:   tModel.FullName,
+			},
+		})
+	}
+
+	return fEntities, nil
 }

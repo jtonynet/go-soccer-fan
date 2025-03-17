@@ -15,3 +15,12 @@ type FanCreateResponse struct {
 	TeamName string    `json:"time"`
 	Message  string    `json:"mensagem"`
 }
+
+type FanNotification struct {
+	FanUID   uuid.UUID `json:"fan_uid"`
+	FanEmail string    `json:"fan_email"`
+	Title    string    `json:"titulo"`
+	Team     string    `json:"time"`
+	Score    string    `json:"placar"`
+	Message  string    `json:"mensagem"`
+}

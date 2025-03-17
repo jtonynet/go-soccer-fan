@@ -5,31 +5,91 @@ networks:
     driver: bridge
 
 volumes:
-  postgres-data:
+  soccer-postgres-data:
     external: false
 
 services:
 
   postgres:
     image: postgres:16.0-alpine
-    container_name: postgres
-    hostname: postgres
+    container_name: soccer-postgres
+    hostname: soccer-postgres
     environment:
-      POSTGRES_USER: api_user
-      POSTGRES_PASSWORD: api_pwd
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: soccer_db_dev
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U api_user -d soccer_db_dev" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d soccer_db_dev" ]
       interval: 2s
       timeout: 5s
       retries: 5
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - soccer-postgres-data:/var/lib/postgresql/data
       - .docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: soccer-rabbitmq
+    hostname: soccer-rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 15s
+      retries: 10
+    networks:
+      - network
+
+
+  mailhog:
+    container_name: soccer-mailhog
+    hostname: soccer-mailhog
+    image: "mailhog/mailhog:v1.0.1"
+    ports:
+      - "1025:1025"                         # SMTP
+      - "8025:8025"                         # Interface web
+    environment:
+      SMTP_USER: user@soccerfan.com
+      SMTP_PASSWORD: pwd
+      EMAILS_FROM_EMAIL: noreply@soccerfan.com
+      SMTP_PORT: 465
+      SMTP_HOST: stunnel
+      EMAILS_FROM_NAME: No reply
+      MAIL_TLS: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8025"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - network
+
+   # Proxy to add TLS encryption on development env, because gomail needs TLS
+  stunnel:
+   image: dweomer/stunnel
+   restart: always
+   environment:
+     - STUNNEL_SERVICE=smtps
+     - STUNNEL_ACCEPT=465
+     - STUNNEL_CONNECT=mailhog:1025
+   networks:
+     - network
+   healthcheck:
+     test: ["CMD", "curl", "--insecure", "--fail", "https://localhost:465"]
+     interval: 30s
+     timeout: 10s
+     retries: 3
+   ports:
+     - 465:465
 
   api-rest:
     build:
@@ -45,11 +105,51 @@ services:
       - network
     depends_on:
       - postgres
+      - rabbitmq
+      - api-match-worker
+      - api-fan-worker
     command: CompileDaemon -build="go build -o /usr/src/app/bin/rest/main /usr/src/app/cmd/rest/main.go" -command="./bin/rest/main"
 
+  api-match-worker:
+    deploy:
+      replicas: 1
+    build:
+      context: ./soccer-api
+      dockerfile: Dockerfile
+    env_file:
+      - ./soccer-api/.env
+    volumes:
+      - ./soccer-api:/usr/src/app
+    networks:
+      - network
+    depends_on:
+      - postgres
+      - rabbitmq
+      - api-fan-worker
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/matchworker/main /usr/src/app/cmd/matchworker/main.go" -command="./bin/matchworker/main"
+
+  api-fan-worker:
+    deploy:
+      replicas: 2
+    build:
+      context: ./soccer-api
+      dockerfile: Dockerfile
+    env_file:
+      - ./soccer-api/.env
+    volumes:
+      - ./soccer-api:/usr/src/app
+    networks:
+      - network
+    depends_on:
+      - postgres
+      - rabbitmq
+      - mailhog
+      - stunnel 
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/fanworker/main /usr/src/app/cmd/fanworker/main.go" -command="./bin/fanworker/main"
+
   api-cli:
-    container_name: soccer-cli
-    hostname: soccer-cli
+    container_name: soccer-api-cli
+    hostname: soccer-api-cli
     build:
       context: ./soccer-api
       dockerfile: Dockerfile

@@ -12,7 +12,7 @@
     https://devicon.dev/
     https://simpleicons.org/
 -->
-[<img src="./docs/assets/images/icons/go.svg" width="25px" height="25px" alt="Go Logo" title="Go">](https://go.dev/) [<img src="./docs/assets/images/icons/gin.svg" width="25px" height="25px" alt="Gin Logo" title="Gin">](https://gin-gonic.com/) [<img src="./docs/assets/images/icons/postgresql.svg" width="25px" height="25px" alt="PostgreSql Logo" title="PostgreSql">](https://www.postgresql.org/)  [<img src="./docs/assets/images/icons/docker.svg" width="25px" height="25px" alt="Docker Logo" title="Docker">](https://www.docker.com/) [<img src="./docs/assets/images/icons/ubuntu.svg" width="25px" height="25px Logo" title="Ubuntu" alt="Ubuntu" />](https://ubuntu.com/) [<img src="./docs/assets/images/icons/dotenv.svg" width="25px" height="25px" alt="Viper DotEnv Logo" title="Viper DotEnv">](https://github.com/spf13/viper) [<img src="./docs/assets/images/icons/github.svg" width="25px" height="25px" alt="GitHub Logo" title="GitHub">](https://github.com/jtonynet) [<img src="./docs/assets/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="VsCode Logo" title="VsCode">](https://code.visualstudio.com/) [<img src="./docs/assets/images/icons/mermaidjs.svg" width="25px" height="25px" alt="MermaidJS Logo" title="MermaidJS">](https://mermaid.js.org/) 
+[<img src="./docs/assets/images/icons/go.svg" width="25px" height="25px" alt="Go Logo" title="Go">](https://go.dev/) [<img src="./docs/assets/images/icons/gin.svg" width="25px" height="25px" alt="Gin Logo" title="Gin">](https://gin-gonic.com/) [<img src="./docs/assets/images/icons/postgresql.svg" width="25px" height="25px" alt="PostgreSql Logo" title="PostgreSql">](https://www.postgresql.org/)  [<img src="./docs/assets/images/icons/docker.svg" width="25px" height="25px" alt="Docker Logo" title="Docker">](https://www.docker.com/) [<img src="./docs/assets/images/icons/ubuntu.svg" width="25px" height="25px Logo" title="Ubuntu" alt="Ubuntu" />](https://ubuntu.com/) [<img src="./docs/assets/images/icons/dotenv.svg" width="25px" height="25px" alt="Viper DotEnv Logo" title="Viper DotEnv">](https://github.com/spf13/viper) [<img src="./docs/assets/images/icons/github.svg" width="25px" height="25px" alt="GitHub Logo" title="GitHub">](https://github.com/jtonynet) [<img src="./docs/assets/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="VsCode Logo" title="VsCode">](https://code.visualstudio.com/) [<img src="./docs/assets/images/icons/mermaidjs.svg" width="25px" height="25px" alt="MermaidJS Logo" title="MermaidJS">](https://mermaid.js.org/) [<img src="./docs/assets/images/icons/rabbitmq.svg" width="25px" height="25px" alt="RabbitMQ Logo" title="RabbitMQ">](https://rabbitmq.com/) [<img src="./docs/assets/images/icons/mailhog.png" width="40px" height="30px" alt="MailHog Logo" title="MailHog">](https://github.com/mailhog/MailHog)
 
 <!-- 
 [<img src="./docs/assets/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger Logo" title="Swagger">](https://swagger.io/) [<img src="./docs/assets/images/icons/githubactions.svg" width="25px" height="25px" alt="GithubActions Logo" title="GithubActions">](https://docs.github.com/en/actions) 
@@ -106,13 +106,129 @@ A `REST` `API` deve responder no caminho `http://localhost:8080`
 <a id="import-data"></a>
 #### ⚽ Importando Campeonatos
 
-Assim que iniciada, a database da `API` não possui dados de campeonatos. Para essas informações, não utilizaremos `seeds` clássicos. Nossa abordagem será a utilização de um `CLI` que importa esses dados da `API` externa. Para isso, execute o seguinte comando:
+Assim que iniciada, a database da `API` não possui dados de campeonatos. A importação dessas informações é realizada por meio de um `CLI` que obtém os dados da `API` externa. Para isso, com o projeto rodando, execute o seguinte comando:
 
 ```bash
-docker exec -ti soccer-cli /usr/src/app/bin/cli/main import competitions
+docker exec -ti soccer-api-cli /usr/src/app/bin/cli/main import competitions
 ```
 
-Essa mesma abordagem pode ser utilizada em produção em um `CronJob`, `RunDeck` ou outros serviços de tarefas agendadas para que os dados sejam atualizados periodicamente.
+Saída esperada (rodando no terminal do VScode):
+<div align="center">
+    <img src="./docs/assets/images/layout/screen-captures/cli_import_data_vscode_terminal.png">
+</div>
+
+Isso facilita o uso de `CronJob`, `RunDeck` ou outros serviços de tarefas agendadas para que os dados sejam atualizados periodicamente.
+
+<br/>
+<div align="center">. . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+<br/>
+
+#### ✍️ Endpoints e Validações
+Uma vez importados os campeonatos e com o projeto em execução, os endpoints e ações vinculados a seguir estarão disponíveis. Esses endpoints podem ser _validados_ via [`Postman`](https://www.postman.com/), [`Insomnia`](https://insomnia.rest/) ou quaisquer clientes `REST` `HTTP`.
+
+1. `GET` `http://localhost:8080/campeonatos`
+   - Lista Campeonatos disponíveis
+   - `Response body:`
+        > ```json
+        > {
+        >   "campeonatos": [
+        >     {
+        >       "id": "ff8180b9-b039-4019-a107-b049271a58d5",
+        >       "nome": "Campeonato Brasileiro Série A",
+        >       "temporada": "2025"
+        >     },
+        >     {
+        >       "id": "194fcf9e-d373-4da6-bf66-96f5de4ae87b",
+        >       "nome": "Championship",
+        >       "temporada": "2025"
+        >     }
+        > }
+        > ```
+
+<br/>
+
+2. `GET` `http://localhost:8080/campeonatos/{ID_CAMPEONATO}/partidas`
+   - Lista Partidas disponíveis por rodada de um campeonato onde `{ID_CAMPEONATO}` é um id de campeonato da listagem do `endpoint` anterior
+   - `Response body:`
+        > ```json
+        > {
+        >   "rodadas": [
+        >     {
+        >       "rodada": 13,
+        >       "partidas": [
+        >         {
+        >           "time_casa": "Flamengo",
+        >           "time_fora": "São Paulo",
+        >           "placar": "-"
+        >         }
+        >       ]
+        >     }
+        >   ]
+        > }
+        > ```
+
+<br/>
+
+3.  `POST` `http://localhost:8080/torcedores`
+   - Cria um torcedor vinculado a um Time onde o campo `time` do `request body` deve ser obrigatoriamente igual ao nome de qualquer time que participe de algum campeonato
+     - `Request body:`
+        > ```json
+        > {
+        >   "nome": "Jonh Doe",
+        >   "email": "jonhdoe@example.com",
+        >   "time": "Flamengo"
+        > }
+        > ```
+     - `Response body:`
+        > ```json
+        > {
+        >     "id": "94383573-f0d5-4aa5-9e98-75de547ef39e",
+        >     "nome": "Jonh Doe",
+        >     "email": "jonhdoe@example.com",
+        >     "time": "Flamengo",
+        >     "mensagem": "Cadastro realizado com sucesso"
+        > }
+        > ```
+
+<br/>
+
+1. `POST` `http://localhost:8080/broadcast`
+   - Faz `broadcast` para todos os `torcedores` do time informado no campo `time` do `request body`, enviando a `mensagem` informada tendo por título a ação do campo `tipo`. Essas mensagens hoje sao enviadas exclusivamente por email (campo que possuímos no cadastro) podendo ser estendidas a outros tipos de notificações no futuro
+   - `Request body:`
+        > ```json
+        > {
+        >  "tipo": "fim",
+        >  "time": "Flamengo",
+        >  "placar": "7-1",
+        >  "mensagem": "O jogo terminou com placar 7-1"
+        > }
+        > ```
+   - `Response body:`
+        > ```json
+        > {
+        >     "mensagem": "Notificação enviada"
+        > }
+        > ```
+
+<br/>
+
+5. O `client` do `RabbitMQ` pode ser acessado na url: [http://localhost:15672/](http://localhost:15672/) (user: admin, senha: admin) com duas filas disponiveis para a aplicação
+   - `MATCH_NOTIFICATIONS` 
+     - Produtor: `api-rest` - Produz UMA notificação de `broadcast` (a mesma do `request body` do endpoint anterior)
+     - Consumidor: `matchworker` - Consome a notificação do time e produz uma mensagem para cada torcedor para `FAN_NOTIFICATIONS`
+   - `FAN_NOTIFICATIONS` 
+     - Produtor: `matchworker` - Explicado anteriormente como `Consumidor` do item anterior
+     - Consumidor: `fanworker` - Consome a notificação dos torcedores e para cada uma faz o envio de um `email` com o campo `mensagam` do `request body` do endpoint `broadcast`
+    - Dessa maneira a `api-rest` delega responsabilidade de envio para uma arquitetura resiliente que pode ser facilmente escalada e as mensagens não enviadas podem cair em uma `Dead Letter Queue` para auditorias
+      - <img src="./docs/assets/images/layout/screen-captures/rabbitmq_client_browser.png">
+
+
+<br/>
+
+6. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/) captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do broadcast.
+   - Tela do `Mailhog`
+      - <img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png">
+
 
 <br/>
 
@@ -287,6 +403,15 @@ Este desafio me permite consolidar conhecimentos e identificar pontos cegos para
 
 <!-- 
 
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+docker rmi $(docker images -q) --force
+docker volume rm $(docker volume ls -q) --force
+docker network prune -f
+docker system prune -a --volumes
+
+sudo systemctl restart docker
+
 #TEST SEEDER
 
 INSERT INTO competitions (uid, name, season, created_at, updated_at)
@@ -317,5 +442,8 @@ ALTER SEQUENCE public.competitions_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.fans_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.matches_id_seq RESTART WITH 1;
 ALTER SEQUENCE public.teams_id_seq RESTART WITH 1;
+
+mailhog: http://localhost:8025/
+rabbitMQ: http://localhost:15672/ - admin-admin
 
 -->
