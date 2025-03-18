@@ -58,7 +58,7 @@ __[Go Soccer Fan](#header)__<br/>
 <a id="about"></a>
 ### 📖 Sobre
 
-**TODO**
+Desafio para a criação de um sistema de consulta e armazenamento de torneios de futebol com seus respectivos times e partidas, consumindo dados de uma API externa com proteções contra rate limit. O sistema também deve armazenar dados de torcedores e, quando uma rota específica for acionada, disparar notificações de início e fim de partida para todos os torcedores cadastrados (podendo ser centenas ou até milhares). Seus componentes devem ser altamente escaláveis.
 
 <br/>
 
@@ -453,10 +453,13 @@ Contrate artistas para projetos comerciais ou mais elaborados e aprenda a ser en
 <a id="conclusion"></a>
 ### 🏁 Conclusão
 
+Os principais requisitos foram atendidos, mas existem pontos de melhoria evidentes que devem ser priorizados em projetos continuados.
+
 - Pontos de Melhoria
-    - Aumento da cobertura de teste se faz necessario
+    - Aumento da cobertura de teste se faz necessário
     - Esteira de `CI` com `GithubActions` para garantir mesclagens seguras
     - Teste de performance com `Gatling` ou `K6` para validar o fluxo de envio de notificações
+    - Arquitetar maneira de automatizar os envios de `broadcast`, em vez de depender do acesso a um endpoint específico.
     - Pela proposta do envio em massa que conta com dois `workers` para garantir a escalabilidade, um bom acrescimo ao projeto seria `Observabilidade`. `Prometheus`, `Grafana` e `Loki` seriam bem vindos.
 
 
