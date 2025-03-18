@@ -321,20 +321,19 @@ Voce tera uma Saída similar a seguinte: (rodando no terminal do VScode):
 <a id="system-deploy"></a>
 ### 🚀 Sistema & Deploy
 
-O sistema esta dividido da seguinte maneira:
+`Golang` permite a criação de múltiplos binários com pontos de entrada distintos que podem ser `deployados` em `pipelines` individuais, gerando seus respectivos `artefatos`, enquanto compartilham partes cruciais da `codebase`. Aproveitando essa funcionalidade, o sistema está dividido da seguinte maneira:
 
-- `CLI` para importação de dados: Para a tarefa de importação de competições, times e jogos. Este componente não precisa escalar, pois pode ser executado via cron job, manualmente, porem sem alta demanda de concorrencia.
+- `CLI`: Responsável pela importação de competições, times e jogos. Este componente não precisa escalar, pois pode ser executado via cron job ou manualmente, sem alta demanda de concorrência.
 
-- `REST API`: Gerencia dados de torcedores, competições e partidas. Este componente deve escalar para lidar com o tráfego de usuários que acessam e manipulam dados.
+- `REST`: Gerencia dados de torcedores, competições e partidas. Este componente deve escalar para lidar com o tráfego de usuários que acessam e manipulam dados.
 
 - `matchworker`: Processa eventos de partidas e "explode" essas mensagens para torcedores interessados. Este componente deve escalar horizontalmente.
 
 - `fanworker`: Responsável por enviar notificações para torcedores. Este componente também deve escalar horizontalmente devido ao potencial alto volume de notificações. Precisa processar eventos de partidas em tempo real para milhões de torcedores, especialmente em casos de grandes torcidas.
 
-
 Podemos configurar uma pipeline de `CI/CD` usando `GitHub Actions` para automatizar o build e push das imagens `Docker` para um `Docker registry`.
 
-Nessa esteira, ao ser validado cada componente, eles seriam deployados para seus respectivos conjuntos de `Pods` respeitando suas necessidades de escala.
+Nessa esteira, ao ser validado cada componente, eles seriam deployados para seus respectivos conjuntos de `Pods`, respeitando suas necessidades de escala.
 
 <br/>
 
@@ -454,7 +453,12 @@ Contrate artistas para projetos comerciais ou mais elaborados e aprenda a ser en
 <a id="conclusion"></a>
 ### 🏁 Conclusão
 
-- TODO
+- Pontos de Melhoria
+    - Aumento da cobertura de teste se faz necessario
+    - Esteira de `CI` com `GithubActions` para garantir mesclagens seguras
+    - Teste de performance com `Gatling` ou `K6` para validar o fluxo de envio de notificações
+    - Pela proposta do envio em massa que conta com dois `workers` para garantir a escalabilidade, um bom acrescimo ao projeto seria `Observabilidade`. `Prometheus`, `Grafana` e `Loki` seriam bem vindos.
+
 
 Este desafio me permite consolidar conhecimentos e identificar pontos cegos para aprimoramento. Continuarei trabalhando para evoluir o projeto e expandir minhas habilidades.
 
