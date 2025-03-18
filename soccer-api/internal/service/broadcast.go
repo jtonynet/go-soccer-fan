@@ -22,7 +22,7 @@ func NewBroadcast(pubsub *pubsub.RabbitMQ, teamRepo repository.Team, queue strin
 }
 
 func (b *Broadcast) Publish(bReq *dto.BroadcastSendRequest) (*dto.BroadcastResponse, error) {
-	_, err := b.teamRepo.FindFansByTeamName(context.Background(), bReq.TeamName)
+	_, err := b.teamRepo.FindByTeamName(context.Background(), bReq.TeamName)
 	if err != nil {
 		return nil, errors.New("not found")
 	}
