@@ -138,7 +138,7 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
     - 🟢 Rotas que podem ser acessadas sem autenticação
     - 🔴 Rotas que exigem autenticação
 
-Deve-se informar como `Authozition` `Baerer-Token` o valor do `token` informado apos consulta rota `/auth/login` nas requisições das 🔴 Rotas que exigem autenticação. 
+Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos consulta rota `/auth/login` nas requisições das 🔴 Rotas que exigem autenticação. 
 
 <br/>
 
@@ -181,10 +181,14 @@ Deve-se informar como `Authozition` `Baerer-Token` o valor do `token` informado 
         >   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         >}
         > ```
+     - Configurando `Baerer` no `Postman`:
+      - <div align="center"><img src="./docs/assets/images/layout/screen-captures/postman_request_with_token.png"></div>
+     - Configurando `Baerer` no `Insominia`:
+      - <div align="center"><img src="./docs/assets/images/layout/screen-captures/insomnia_request_with_token.png"></div>
 
 <br/>
 
-3. 🔴`GET` `http://localhost:8080/campeonatos`
+1. 🔴`GET` `http://localhost:8080/campeonatos`
    - Lista Campeonatos disponíveis
    - `Response body:`
         > ```json
@@ -273,7 +277,7 @@ Deve-se informar como `Authozition` `Baerer-Token` o valor do `token` informado 
 
 7. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/). Ele captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do `broadcast`.
    - Tela do `Mailhog`
-      - <img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png">
+      - <div align="center"><img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png"></div>
       -  Caso os emails não apareçam  imediatamente após o endpoint de `broadcast` ter respondido com `status-code` `202` e com ` "mensagem": "Notificação enviada"` clique no botao de refresh `🔄` do `Mailhog`
 
 <br/>
@@ -286,7 +290,7 @@ Deve-se informar como `Authozition` `Baerer-Token` o valor do `token` informado 
      - Produtor: `matchworker` - Explicado anteriormente como `Consumidor` do item anterior
      - Consumidor: `fanworker` - Consome a notificação dos torcedores e para cada uma faz o envio de um `email` com o campo `mensagam` do `request body` do endpoint `broadcast`
     - Dessa maneira a `api-rest` delega responsabilidade de envio para uma arquitetura resiliente que pode ser facilmente escalada e as mensagens não enviadas podem cair em uma `Dead Letter Queue` para auditorias
-      - <img src="./docs/assets/images/layout/screen-captures/rabbitmq_client_browser.png">
+      - <div align="center"><img src="./docs/assets/images/layout/screen-captures/rabbitmq_client_browser.png"></div>
 
 <br/>
 
