@@ -182,14 +182,16 @@ func (suite *ginRoutesSuite) SetupSuite() {
 	fakeCRepo := NewFakeCompetitionRepo(fDB)
 	fakeFRepo := NewFakeFanRepo(fDB)
 
-	cService := service.NewCompetition(fakeCRepo)
-	fService := service.NewFan(fakeFRepo)
-	nService := &service.Broadcast{}
+	userService := &service.User{}
+	competitionService := service.NewCompetition(fakeCRepo)
+	fanService := service.NewFan(fakeFRepo)
+	broadcastService := &service.Broadcast{}
 
 	suite.r = NewGinRoutes(
-		cService,
-		fService,
-		nService, // TODO
+		userService, // TODO
+		competitionService,
+		fanService,
+		broadcastService, // TODO
 	)
 }
 
