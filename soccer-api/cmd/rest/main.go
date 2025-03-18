@@ -43,7 +43,7 @@ func main() {
 		competitionService,
 		fanService,
 		broadcastService,
-	).Run()
+	).Run(cfg.API.Port)
 	if err != nil {
 		panic("can't start routes")
 	}

@@ -13,7 +13,7 @@ var secretKey = os.Getenv("API_SECRET_KEY")
 
 func GenerateToken(userID uint) (string, error) {
 
-	token_lifespan, err := strconv.Atoi(os.Getenv("API_TOKEN_LIFESPAN"))
+	token_lifespan, err := strconv.Atoi(os.Getenv("API_TOKEN_LIFESPAN_IN_H"))
 
 	if err != nil {
 		return "", err

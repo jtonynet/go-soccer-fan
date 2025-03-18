@@ -3,9 +3,9 @@ package dto
 import "github.com/google/uuid"
 
 type FanCreateRequest struct {
-	Name     string `json:"nome" `
-	Email    string `json:"email"`
-	TeamName string `json:"time" `
+	Name     string `json:"nome" validate:"required,min=3,max=255" binding:"required" example:"Arthur Antunes Coimbra"`
+	Email    string `json:"email" validate:"required,email,min=5,max=255" binding:"required" example:"zico@gmail.com"`
+	TeamName string `json:"time" validate:"required,min=5,max=255" binding:"required" example:"Flamengo"`
 }
 
 type FanCreateResponse struct {

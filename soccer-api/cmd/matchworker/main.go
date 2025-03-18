@@ -15,6 +15,11 @@ import (
 )
 
 func main() {
+	/*
+		TODO:
+			Criar Handler e Service especificos para esse worker
+	*/
+
 	cfg := config.LoadConfig()
 
 	gormConn, err := database.NewGormCom(cfg.Database)
@@ -47,13 +52,13 @@ func main() {
 			score = bReq.Score
 		}
 
-		fanEntities, _ := teamRepo.FindFansByTeamName(context.Background(), bReq.Team)
+		fanEntities, _ := teamRepo.FindFansByTeamName(context.Background(), bReq.TeamName)
 		for _, fan := range fanEntities {
 			fanNotification := &dto.FanNotification{
 				FanUID:   fan.UID,
 				FanEmail: fan.Email,
-				Title:    fmt.Sprintf("%s da partida do: %s", bReq.Type, bReq.Team),
-				Team:     bReq.Team,
+				Title:    fmt.Sprintf("%s da partida do: %s", bReq.Type, bReq.TeamName),
+				Team:     bReq.TeamName,
 				Score:    score,
 				Message:  bReq.Message,
 			}

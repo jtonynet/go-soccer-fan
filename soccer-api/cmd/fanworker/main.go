@@ -12,6 +12,11 @@ import (
 )
 
 func main() {
+	/*
+		TODO:
+			Criar Handler e Service especificos para esse worker
+	*/
+
 	cfg := config.LoadConfig()
 
 	mailService := service.NewMail(cfg.MailNotification)

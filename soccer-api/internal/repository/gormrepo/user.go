@@ -103,7 +103,6 @@ func (u *User) Login(ctx context.Context, userName, password string) (string, er
 		return "", err
 	}
 
-	// err = verifyPassword(password, uModel.Password)
 	err = bcrypt.CompareHashAndPassword([]byte(uModel.Password), []byte(password))
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
@@ -118,7 +117,3 @@ func (u *User) Login(ctx context.Context, userName, password string) (string, er
 
 	return token, nil
 }
-
-// func verifyPassword(password, hashedPassword string) error {
-// 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-// }
