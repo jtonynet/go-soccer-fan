@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/dto"
+	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/middleware"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/service"
 )
 
@@ -20,52 +21,6 @@ func NewGinRoutes(
 	broadcastService *service.Broadcast,
 ) *ginRoutes {
 	e := gin.Default()
-
-	e.POST("/user", func(c *gin.Context) {
-		var uReq dto.UserCreateRequest
-		if err := c.ShouldBindJSON(&uReq); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"erro": "corpo da requisição inválido",
-			})
-			return
-		}
-
-		// TODO: VALIDATES DTO IN FUTURE
-
-		uResp, err := userService.Create(&uReq)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"erro": "erro interno, tente novamente mais tarde",
-			})
-			return
-		}
-
-		c.JSON(http.StatusAccepted, uResp)
-
-	})
-
-	e.GET("/campeonatos", func(c *gin.Context) {
-		result, _ := competitionService.FindAll()
-		c.JSON(http.StatusOK, result)
-	})
-
-	e.GET("/campeonatos/:uid/partidas", func(c *gin.Context) {
-		uid, err := uuid.Parse(c.Param("uid"))
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"erro": "campeonato com URI ID inválido",
-			})
-			return
-		}
-
-		result, err := competitionService.FindMatchsByCompetitionUID(uid)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"erro": "erro interno, tente novamente mais tarde",
-			})
-		}
-		c.JSON(http.StatusOK, result)
-	})
 
 	e.POST("/torcedores", func(c *gin.Context) {
 		var fReq dto.FanCreateRequest
@@ -89,7 +44,77 @@ func NewGinRoutes(
 		c.JSON(http.StatusAccepted, fResp)
 	})
 
-	e.POST("/broadcast", func(c *gin.Context) {
+	e.POST("/user", func(c *gin.Context) {
+		var uReq dto.UserCreateRequest
+		if err := c.ShouldBindJSON(&uReq); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"erro": "corpo da requisição inválido",
+			})
+			return
+		}
+
+		// TODO: VALIDATES DTO IN FUTURE
+
+		uResp, err := userService.Create(&uReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				// "erro": "erro interno, tente novamente mais tarde",
+				"erro": err,
+			})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, uResp)
+
+	})
+
+	e.POST("/auth/login", func(c *gin.Context) {
+		var uReq dto.UserLoginRequest
+		if err := c.ShouldBindJSON(&uReq); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"erro": "corpo da requisição inválido",
+			})
+			return
+		}
+
+		// TODO: VALIDATES DTO IN FUTURE
+
+		uResp, err := userService.Login(&uReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"erro": err,
+			})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, uResp)
+
+	})
+
+	e.GET("/campeonatos", middleware.JwtAuthMiddleware(), func(c *gin.Context) {
+		result, _ := competitionService.FindAll()
+		c.JSON(http.StatusOK, result)
+	})
+
+	e.GET("/campeonatos/:uid/partidas", middleware.JwtAuthMiddleware(), func(c *gin.Context) {
+		uid, err := uuid.Parse(c.Param("uid"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"erro": "campeonato com URI ID inválido",
+			})
+			return
+		}
+
+		result, err := competitionService.FindMatchsByCompetitionUID(uid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"erro": "erro interno, tente novamente mais tarde",
+			})
+		}
+		c.JSON(http.StatusOK, result)
+	})
+
+	e.POST("/broadcast", middleware.JwtAuthMiddleware(), func(c *gin.Context) {
 		var bReq dto.BroadcastSendRequest
 		if err := c.ShouldBindJSON(&bReq); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{

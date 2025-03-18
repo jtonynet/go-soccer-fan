@@ -34,7 +34,7 @@ func (u *User) FindByUID(ctx context.Context, uid uuid.UUID) (*entity.User, erro
 	return &entity.User{
 		ID:       uModel.ID,
 		UID:      uModel.UID,
-		UserName: uModel.UserName,
+		UserName: uModel.Username,
 		Password: "",
 		Name:     uModel.Name,
 		Email:    uModel.Email,
@@ -54,7 +54,7 @@ func (u *User) FindByUserName(ctx context.Context, userName string) (*entity.Use
 	return &entity.User{
 		ID:       uModel.ID,
 		UID:      uModel.UID,
-		UserName: uModel.UserName,
+		UserName: uModel.Username,
 		Password: "",
 		Name:     uModel.Name,
 		Email:    uModel.Email,
@@ -71,7 +71,7 @@ func (u *User) Create(ctx context.Context, eUser *entity.User) (*entity.User, er
 
 	uModel := model.User{
 		UID:      eUser.UID,
-		UserName: eUser.UserName,
+		Username: eUser.UserName,
 		Password: eUser.Password,
 		Name:     eUser.Name,
 		Email:    eUser.Email,
@@ -85,14 +85,14 @@ func (u *User) Create(ctx context.Context, eUser *entity.User) (*entity.User, er
 	return &entity.User{
 		ID:       uModel.ID,
 		UID:      uModel.UID,
-		UserName: uModel.UserName,
+		UserName: uModel.Username,
 		Password: "",
 		Name:     uModel.Name,
 		Email:    uModel.Email,
 	}, nil
 }
 
-func (u *User) LoginCheck(ctx context.Context, userName, password string) (string, error) {
+func (u *User) Login(ctx context.Context, userName, password string) (string, error) {
 	var err error
 
 	uModel := model.User{}

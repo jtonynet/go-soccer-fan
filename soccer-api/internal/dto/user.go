@@ -3,15 +3,24 @@ package dto
 import "github.com/google/uuid"
 
 type UserCreateRequest struct {
-	UserName string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Name     string `json:"name" binding:"required"`
+	UserName string `json:"usuario" binding:"required"`
+	Password string `json:"senha" binding:"required"`
+	Name     string `json:"nome" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
 }
 
 type UserCreateResponse struct {
-	UID      uuid.UUID
-	UserName string
-	Name     string
-	Email    string
+	UID      uuid.UUID `json:"id"`
+	UserName string    `json:"usuario"`
+	Name     string    `json:"nome"`
+	Email    string    `json:"email"`
+}
+
+type UserLoginRequest struct {
+	UserName string `json:"usuario" binding:"required"`
+	Password string `json:"senha" binding:"required"`
+}
+
+type UserLoginResponse struct {
+	Token string `json:"token"`
 }

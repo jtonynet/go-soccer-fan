@@ -134,31 +134,57 @@ Isso facilita o uso de `CronJob`, `RunDeck` ou outros serviços de tarefas agend
 
 Uma vez importados os campeonatos e com o projeto em execução, os endpoints e ações vinculados a seguir estarão disponíveis. Esses endpoints podem ser _validados_ via [`Postman`](https://www.postman.com/), [`Insomnia`](https://insomnia.rest/) ou quaisquer clientes `REST` `HTTP`.
 
-1. `POST` `http://localhost:8080/user`
-    - Cria um usuário administrativo (rota aberta por simplicidade. Em um sistema real, essa rota deve ser protegida e interna, não sendo exposta ao público em geral ou acessível diretamente, mas sim proveniente de outro sistema de autenticação).
+- Legenda:
+    - 🟢 Rotas que podem ser acessadas sem autenticação
+    - 🔴 Rotas que exigem autenticação
+
+Deve-se informar como `Authozition` `Baerer-Token` o valor do `token` informado apos consulta rota `/auth/login` nas requisições das 🔴 Rotas que exigem autenticação. 
+
+<br/>
+
+1. 🟢 `POST` `http://localhost:8080/user`
+    - Cria um usuário administrativo (rota aberta por simplicidade. Em um sistema real, essa rota deve ser protegida e interna, não sendo exposta ao público em geral ou acessível diretamente).
      - `Request body:`
         > ```json
         > {
-        > 	"username": "admin",
-        > 	"password": "admin",
-        > 	"name": "admin",
-        > 	"email": "admin@admin.com"
+        > 	"usuario": "admin",
+        > 	"senha": "admin",
+        > 	"nome": "Edson Arantes do Nascimento",
+        > 	"email": "pele@soccerfan.com"
         > }
         > ```
      - `Response body:`
         > ```json
         > {
-        >     "UID": "7de7a50e-df58-467c-8f9e-f7f5498d37ad",
-        >     "UserName": "admin",
-        >     "Name": "admin",
-        >     "Email": "admin@admin.com"
+        >     "id": "7de7a50e-df58-467c-8f9e-f7f5498d37ad",
+        >     "usuario": "admin",
+        >     "nome": "Edson Arantes do Nascimento",
+        >     "email": "pele@soccerfan.com"
         > }
         > ```
 
 
 <br/>
 
-2. `GET` `http://localhost:8080/campeonatos`
+2. 🟢 `POST` `http://localhost:8080/auth/login`
+     - Autentica um usuário administrativo (rota aberta por simplicidade. Em um sistema real, essa rota deve ser protegida e interna, não sendo exposta ao público em geral ou acessível diretamente).
+     - `Request body:`
+        > ```json
+        > {
+        >   "usuario": "admin",
+        >   "senha": "admin"
+        > }
+        > ```
+     - `Response body:`
+        > ```json
+        >{
+        >   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        >}
+        > ```
+
+<br/>
+
+3. 🔴`GET` `http://localhost:8080/campeonatos`
    - Lista Campeonatos disponíveis
    - `Response body:`
         > ```json
@@ -180,7 +206,7 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
 
 <br/>
 
-2. `GET` `http://localhost:8080/campeonatos/{ID_CAMPEONATO}/partidas`
+4. 🔴`GET` `http://localhost:8080/campeonatos/{ID_CAMPEONATO}/partidas`
    - Lista Partidas disponíveis por rodada de um campeonato onde `{ID_CAMPEONATO}` é um id de campeonato da listagem do `endpoint` anterior
    - `Response body:`
         > ```json
@@ -202,30 +228,30 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
 
 <br/>
 
-3.  `POST` `http://localhost:8080/torcedores`
+5. 🟢`POST` `http://localhost:8080/torcedores`
    - Cria um torcedor vinculado a um Time onde o campo `time` do `request body` deve ser obrigatoriamente igual ao nome de qualquer time que participe de algum campeonato
-     - `Request body:`
-        > ```json
-        > {
-        >   "nome": "Jonh Doe",
-        >   "email": "jonhdoe@example.com",
-        >   "time": "Flamengo"
-        > }
-        > ```
-     - `Response body:`
-        > ```json
-        > {
-        >     "id": "94383573-f0d5-4aa5-9e98-75de547ef39e",
-        >     "nome": "Jonh Doe",
-        >     "email": "jonhdoe@example.com",
-        >     "time": "Flamengo",
-        >     "mensagem": "Cadastro realizado com sucesso"
-        > }
-        > ```
+    - `Request body:`
+       > ```json
+       > {
+       >   "nome": "Jonh Doe",
+       >   "email": "jonhdoe@example.com",
+       >   "time": "Flamengo"
+       > }
+       > ```
+    - `Response body:`
+       > ```json
+       > {
+       >     "id": "94383573-f0d5-4aa5-9e98-75de547ef39e",
+       >     "nome": "Jonh Doe",
+       >     "email": "jonhdoe@example.com",
+       >     "time": "Flamengo",
+       >     "mensagem": "Cadastro realizado com sucesso"
+       > }
+       > ```
 
 <br/>
 
-4. `POST` `http://localhost:8080/broadcast`
+6. 🔴`POST` `http://localhost:8080/broadcast`
    - Faz `broadcast` para todos os `torcedores` do time informado no campo `time` do `request body`, enviando a `mensagem` informada tendo por título a ação do campo `tipo`. Essas mensagens hoje são enviadas exclusivamente por email (campo que possuímos no cadastro) podendo ser estendidas a outros tipos de notificações no futuro
    - `Request body:`
         > ```json
@@ -245,16 +271,16 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
 
 <br/>
 
-5. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/). Ele captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do `broadcast`.
+7. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/). Ele captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do `broadcast`.
    - Tela do `Mailhog`
       - <img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png">
       -  Caso os emails não apareçam  imediatamente após o endpoint de `broadcast` ter respondido com `status-code` `202` e com ` "mensagem": "Notificação enviada"` clique no botao de refresh `🔄` do `Mailhog`
 
 <br/>
 
-6. O `client` do `RabbitMQ` pode ser acessado na url: [http://localhost:15672/](http://localhost:15672/) (user: admin, senha: admin). Ele possui duas filas disponiveis para a aplicação
+8. O `client` do `RabbitMQ` pode ser acessado na url: [http://localhost:15672/](http://localhost:15672/) (user: admin, senha: admin). Ele possui duas filas disponiveis para a aplicação
    - `MATCH_NOTIFICATIONS` 
-     - Produtor: `api-rest` - Produz UMA notificação de `broadcast` (a mesma do `request body` do endpoint anterior)
+     - Produtor: `api-rest` - Produz UMA notificação de `broadcast` (a mesma do `request body` do endpoint `http://localhost:8080/broadcast`)
      - Consumidor: `matchworker` - Consome a notificação do time e produz uma mensagem para cada torcedor para `FAN_NOTIFICATIONS`
    - `FAN_NOTIFICATIONS` 
      - Produtor: `matchworker` - Explicado anteriormente como `Consumidor` do item anterior

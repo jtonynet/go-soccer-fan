@@ -28,6 +28,17 @@ func (u *User) Create(uReq *dto.UserCreateRequest) (*dto.UserCreateResponse, err
 	return mapUserEntityToCreateResponseDTO(createdEntity), nil
 }
 
+func (u *User) Login(uReq *dto.UserLoginRequest) (*dto.UserLoginResponse, error) {
+	token, err := u.uRepo.Login(context.Background(), uReq.UserName, uReq.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.UserLoginResponse{
+		Token: token,
+	}, nil
+}
+
 func mapUserCreateRequestDTOtoEntity(uReq *dto.UserCreateRequest) *entity.User {
 	return &entity.User{
 		UID:      uuid.New(),
