@@ -126,13 +126,6 @@ func NewGinRoutes(
 
 		uResp, err := userService.Login(&uReq)
 		if err != nil {
-			if err.Error() == "not found" {
-				c.JSON(http.StatusNotFound, gin.H{
-					"erro": "usuario ou senha incorretos.",
-				})
-				return
-			}
-
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"erro": "erro interno, tente novamente mais tarde",
 			})

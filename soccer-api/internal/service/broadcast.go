@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"log"
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/dto"
@@ -24,7 +24,7 @@ func NewBroadcast(pubsub *pubsub.RabbitMQ, teamRepo repository.Team, queue strin
 func (b *Broadcast) Publish(bReq *dto.BroadcastSendRequest) (*dto.BroadcastResponse, error) {
 	_, err := b.teamRepo.FindFansByTeamName(context.Background(), bReq.TeamName)
 	if err != nil {
-		return nil, fmt.Errorf("team not found: %s", bReq.TeamName)
+		return nil, errors.New("not found")
 	}
 
 	bReqStr, err := json.Marshal(bReq)

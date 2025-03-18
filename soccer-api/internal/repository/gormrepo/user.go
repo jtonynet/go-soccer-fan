@@ -79,6 +79,9 @@ func (u *User) Create(ctx context.Context, eUser *entity.User) (*entity.User, er
 
 	err = u.db.WithContext(ctx).Create(&uModel).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, errors.New("duplicated")
+		}
 		return nil, err
 	}
 
@@ -98,8 +101,10 @@ func (u *User) Login(ctx context.Context, userName, password string) (string, er
 	uModel := model.User{}
 
 	err = u.db.WithContext(ctx).Model(User{}).Where("username = ?", userName).Take(&uModel).Error
-
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", errors.New("not found")
+		}
 		return "", err
 	}
 
