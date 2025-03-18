@@ -139,12 +139,12 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
     - 🟢 Rotas que podem ser acessadas sem autenticação
     - 🔴 Rotas que exigem autenticação
 
-Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos consulta rota `/auth/login` nas requisições das 🔴 Rotas que exigem autenticação. 
+Deve-se informar como `Authorization` `Baerer` o valor do `token` informado apos consulta rota `/auth/login` nas requisições das 🔴 Rotas que exigem autenticação. 
 
 <br/>
 
 1. 🟢 `POST` `http://localhost:8080/user`
-    - Cria um usuário administrativo (rota aberta por simplicidade. Em um sistema real, essa rota deve ser protegida e interna, não sendo exposta ao público em geral ou acessível diretamente).
+    - Cria um usuário administrativo (rota aberta por simplicidade. Em um sistema real, essa rota deve ser protegida e/ou interna, não sendo exposta ao público em geral ou acessível diretamente).
      - `Request body:`
         > ```json
         > {
@@ -168,7 +168,7 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 <br/>
 
 2. 🟢 `POST` `http://localhost:8080/auth/login`
-     - Autentica um usuário administrativo (rota aberta por simplicidade. Em um sistema real, essa rota deve ser protegida e interna, não sendo exposta ao público em geral ou acessível diretamente).
+     - Autentica um usuário administrativo (rota aberta por simplicidade. Em um sistema real, essa rota deve ser protegida e/ou interna, não sendo exposta ao público em geral ou acessível diretamente).
      - `Request body:`
         > ```json
         > {
@@ -212,7 +212,7 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 <br/>
 
 4. 🔴`GET` `http://localhost:8080/campeonatos/{ID_CAMPEONATO}/partidas`
-   - Lista Partidas disponíveis por rodada de um campeonato onde `{ID_CAMPEONATO}` é um id de campeonato da listagem do `endpoint` anterior
+   - Lista Partidas disponíveis por rodada de um campeonato, onde `{ID_CAMPEONATO}` é um id de campeonato da listagem do `endpoint` anterior
    - `Response body:`
         > ```json
         > {
@@ -234,7 +234,7 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 <br/>
 
 5. 🟢`POST` `http://localhost:8080/torcedores`
-   - Cria um torcedor vinculado a um Time onde o campo `time` do `request body` deve ser obrigatoriamente igual ao nome de qualquer time que participe de algum campeonato
+   - Cria um torcedor vinculado a um time onde o campo `time` do `request body` deve ser obrigatoriamente igual ao nome de qualquer time que participe de algum campeonato
     - `Request body:`
        > ```json
        > {
@@ -257,7 +257,7 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 <br/>
 
 6. 🔴`POST` `http://localhost:8080/broadcast`
-   - Faz `broadcast` para todos os `torcedores` do time informado no campo `time` do `request body`, enviando a `mensagem` informada tendo por título a ação do campo `tipo`. Essas mensagens hoje são enviadas exclusivamente por email (campo que possuímos no cadastro) podendo ser estendidas a outros tipos de notificações no futuro
+   - Faz `broadcast` para todos os `torcedores` do time informado no campo `time` do `request body`, enviando a `mensagem` informada tendo por título o valor do campo `tipo`. Essas mensagens hoje são enviadas exclusivamente por email (campo que possuímos no cadastro) podendo ser estendidas a outros tipos de notificações no futuro
    - `Request body:`
         > ```json
         > {
@@ -286,7 +286,7 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 
 <br/>
 
-1. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/). Ele captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do `broadcast`.
+7. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/). Ele captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do `broadcast`.
    - Tela do `Mailhog`
       - <div align="center"><img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png"></div>
       -  Caso os emails não apareçam  imediatamente após o endpoint de `broadcast` ter respondido com `status-code` `202` e com ` "mensagem": "Notificação enviada"` clique no botao de refresh `🔄` do `Mailhog`
@@ -312,12 +312,12 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 <a id="tests"></a>
 ### ✅ Testes
 
-Evitando conflitos no desenvolvimento, uma vez que estamos desenvolvendo com `dockerizado` com `live reload`, com as dependencias sendo executadas use o seguinte comando:
+Evitando conflitos no desenvolvimento, uma vez que estamos desenvolvendo com `dockerizado` com `live reload` (o `Dockerfile` foi criado visando exclusivamente desenvolvimento e validação.), com as dependencias sendo executadas use o seguinte comando:
 ```bash
 docker exec -ti soccer-api-rest-1 go test -v -count=1 ./internal/routes
 ```
 
-Voce tera uma Saída similar a seguinte: (rodando no terminal do VScode):
+Você terá uma saída semelhante à seguinte: (executando no terminal do VS Code):
 <div align="center">
     <img src="./docs/assets/images/layout/screen-captures/tests_vscode_terminal.png">
 </div>
@@ -337,9 +337,19 @@ Voce tera uma Saída similar a seguinte: (rodando no terminal do VScode):
 
 - `REST`: Gerencia dados de torcedores, competições e partidas. Este componente deve escalar para lidar com o tráfego de usuários que acessam e manipulam dados.
 
-- `matchworker`: Processa eventos de partidas e "explode" essas mensagens para torcedores interessados. Este componente deve escalar horizontalmente.
+- `matchworker`: Processa eventos de partidas e "explode" essas mensagens para torcedores interessados. Este componente deve escalar horizontalmente. Essa escalabilidade pode ser simulada localmente alterando o campo `replicas` da `service` no `docker-compose.yml`
+    >```yml
+    >  api-match-worker:
+    >    deploy:
+    >      replicas: 1
+    >```
 
-- `fanworker`: Responsável por enviar notificações para torcedores. Este componente também deve escalar horizontalmente devido ao potencial alto volume de notificações. Precisa processar eventos de partidas em tempo real para milhões de torcedores, especialmente em casos de grandes torcidas.
+- `fanworker`: Responsável por enviar notificações para torcedores. Este componente também deve escalar horizontalmente devido ao potencial alto volume de notificações. Precisa processar eventos de partidas em tempo real para milhões de torcedores, especialmente em casos de grandes torcidas. Essa escalabilidade pode ser simulada localmente alterando o campo `replicas` da `service` no `docker-compose.yml`
+    >```yml
+    >  api-fan-worker:
+    >    deploy:
+    >      replicas: 2
+    >```
 
 Podemos configurar uma pipeline de `CI/CD` usando `GitHub Actions` para automatizar o build e push das imagens `Docker` para um `Docker registry`.
 
@@ -361,6 +371,20 @@ Nessa esteira, ao ser validado cada componente, eles seriam deployados para seus
 
 ```mermaid
 erDiagram
+
+    users {
+        int id pk
+	    UUID uid      
+	    string username 
+	    string password 
+	    string name     
+	    string email
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at   
+    }
+
+
     competitions {
         int id pk
         int area_id
@@ -368,6 +392,9 @@ erDiagram
         UUID uid
         string name
         string season
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
     }
     
     matches {
@@ -380,6 +407,9 @@ erDiagram
         int away_team_id fk
         int home_team_score
         int away_team_score
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
     }
 
     teams {
@@ -387,6 +417,9 @@ erDiagram
         string external_id
         UUID uid
         string name
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
     }
 
     fans {
@@ -395,6 +428,9 @@ erDiagram
         string name
         string email
         int team_id fk
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
     }
 
     competitions ||--o{ matches : possesses
@@ -469,12 +505,13 @@ Os principais requisitos foram atendidos, mas existem pontos de melhoria evident
     - Filtros opcionais
     - Aumento da cobertura de teste se faz necessário
     - Formatar mensagens de erro do validador
+    - Adotar um `Identity Manager`  mais robusto como `Keycloack` para geranciamento de `roles` (torcedor, usuário admin)
     - Esteira de `CI` com `GithubActions` para garantir mesclagens seguras
+    - Documentação Swagger
 
 <br/>
 
 - Desejáveis
-    - Adotar um `Identity Manager`  mais robusto como `Keycloack` para geranciamento de `roles` (torcedor, usuário admin)
     - Arquitetar maneira de automatizar os envios de `broadcast`, em vez de depender do acesso a um endpoint específico.
     - Teste de performance com `Gatling` ou `K6` para validar o fluxo de envio de notificações
     - Pela proposta do envio em massa que conta com dois `workers` para garantir a escalabilidade, um bom acrescimo ao projeto seria `Observabilidade`. `Prometheus`, `Grafana` e `Loki` seriam bem vindos.

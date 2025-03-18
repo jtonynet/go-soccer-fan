@@ -219,6 +219,7 @@ func (s *DataFetch) fetchAndStoreMatches(ctx context.Context, cEntity *entity.Co
 
 func (s *DataFetch) fetchFromExternalAPI(ctx context.Context, uriFragment string) ([]byte, error) {
 	apiURL := fmt.Sprintf("%s/%s", s.cfg.URL, uriFragment)
+	countFailure := 0
 
 	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
 	if err != nil {
@@ -259,7 +260,8 @@ func (s *DataFetch) fetchFromExternalAPI(ctx context.Context, uriFragment string
 	}
 
 	notify := func(err error, t time.Duration) {
-		log.Printf("retentando `%s` após : %v\n", uriFragment, err)
+		countFailure++
+		log.Printf("%v falha(s) em buscar `%s` após erro: %v\n", countFailure, uriFragment, err)
 	}
 
 	retry := backoff.NewExponentialBackOff()
