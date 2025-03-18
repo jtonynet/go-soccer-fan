@@ -6,6 +6,12 @@ import (
 	"strconv"
 )
 
+type API struct {
+	Port             int
+	SecretKey        string
+	TokenLifespanInH int
+}
+
 type Database struct {
 	Host     string
 	User     string
@@ -41,6 +47,7 @@ type MailNotification struct {
 }
 
 type Config struct {
+	API              *API
 	Database         *Database
 	ExternalApi      *ExternalApi
 	RabbitMQ         *RabbitMQ
@@ -48,6 +55,16 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
+	apiPort, err := strconv.Atoi(os.Getenv("API_PORT"))
+	if err != nil {
+		log.Fatalf("Erro ao converter API_PORT para inteiro: %v", err)
+	}
+
+	apiTokenLifespanInH, err := strconv.Atoi(os.Getenv("API_TOKEN_LIFESPAN_IN_H"))
+	if err != nil {
+		log.Fatalf("Erro ao converter API_TOKEN_LIFESPAN_IN_H para inteiro: %v", err)
+	}
+
 	smtpPort, err := strconv.Atoi(os.Getenv("MAIL_NOTIFICATION_SMTP_PORT"))
 	if err != nil {
 		log.Fatalf("Erro ao converter MAIL_NOTIFICATION_SMTP_PORT para inteiro: %v", err)
@@ -64,6 +81,11 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
+		API: &API{
+			Port:             apiPort,
+			SecretKey:        os.Getenv("API_SECRET_KEY"),
+			TokenLifespanInH: apiTokenLifespanInH,
+		},
 		Database: &Database{
 			Host:     os.Getenv("DATABASE_HOST"),
 			User:     os.Getenv("DATABASE_USER"),

@@ -3,10 +3,10 @@ package dto
 import "github.com/google/uuid"
 
 type UserCreateRequest struct {
-	UserName string `json:"usuario" binding:"required"`
-	Password string `json:"senha" binding:"required"`
-	Name     string `json:"nome" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
+	UserName string `json:"usuario" validate:"required,min=3,max=255" binding:"required" example:"admin"`
+	Password string `json:"senha" validate:"required,min=5,max=255" binding:"required" example:"admin"`
+	Name     string `json:"nome" validate:"required,min=3,max=255" binding:"required" example:"Edson Arantes do Nascimento"`
+	Email    string `json:"email" validate:"required,min=5,max=255" binding:"required,email" example:"pele@soccerfan.com"`
 }
 
 type UserCreateResponse struct {
@@ -17,8 +17,8 @@ type UserCreateResponse struct {
 }
 
 type UserLoginRequest struct {
-	UserName string `json:"usuario" binding:"required"`
-	Password string `json:"senha" binding:"required"`
+	UserName string `json:"usuario" validate:"required,min=3,max=255" binding:"required" example:"admin"`
+	Password string `json:"senha" validate:"required,min=5,max=255" binding:"required" example:"admin"`
 }
 
 type UserLoginResponse struct {

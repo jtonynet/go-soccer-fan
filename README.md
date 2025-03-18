@@ -45,12 +45,13 @@ __[Go Soccer Fan](#header)__<br/>
       - ⚽ [Importando Campeonatos](#import-data)
       - ✍️ [Endpoints e Uso](#run-use)
   4.  ✅ [Testes](#tests)
-  5.  🧠 [ADR - Architecture Decision Records](#adr)
-  6.  🔢 [Versões](#versions)
-  7.  📊 [Diagramas](#diagrams)
+  5.  🚀 [Sistema & Deploy](#system-deploy)
+  6.  🧠 [ADR - Architecture Decision Records](#adr)
+  7.  🔢 [Versões](#versions)
+  8.  📊 [Diagramas](#diagrams)
       - 📈 [ER](#diagrams-erchart)
-  8.  🤖 [Uso de IA](#ia)
-  9.  🏁 [Conclusão](#conclusion)
+  9.  🤖 [Uso de IA](#ia)
+  10. 🏁 [Conclusão](#conclusion)
 
 <hr/>
 
@@ -188,7 +189,7 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 
 <br/>
 
-1. 🔴`GET` `http://localhost:8080/campeonatos`
+3. 🔴`GET` `http://localhost:8080/campeonatos`
    - Lista Campeonatos disponíveis
    - `Response body:`
         > ```json
@@ -301,25 +302,39 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 <a id="tests"></a>
 ### ✅ Testes
 
-Rodando localmente com `GO v1.23.2`
-
-Caso não tenha as dependência instaladas, instale-as localmente na pasta da `API`:
+Evitando conflitos no desenvolvimento, uma vez que estamos desenvolvendo com `dockerizado` com `live reload`, com as dependencias sendo executadas use o seguinte comando:
 ```bash
-cd soccer-api
-go mod download
+docker exec -ti soccer-api-rest-1 go test -v -count=1 ./internal/routes
 ```
 
-<br/>
-
-Performe os testes na pasta da `API`:
-```bash
-go test -v -count=1 ./internal/routes
-```
-
-Saída esperada (rodando no terminal do VScode):
+Voce tera uma Saída similar a seguinte: (rodando no terminal do VScode):
 <div align="center">
     <img src="./docs/assets/images/layout/screen-captures/tests_vscode_terminal.png">
 </div>
+
+<br/>
+
+[⤴️ de volta ao índice](#index)
+
+---
+
+<a id="system-deploy"></a>
+### 🚀 Sistema & Deploy
+
+O sistema esta dividido da seguinte maneira:
+
+- `CLI` para importação de dados: Para a tarefa de importação de competições, times e jogos. Este componente não precisa escalar, pois pode ser executado via cron job, manualmente, porem sem alta demanda de concorrencia.
+
+- `REST API`: Gerencia dados de torcedores, competições e partidas. Este componente deve escalar para lidar com o tráfego de usuários que acessam e manipulam dados.
+
+- `matchworker`: Processa eventos de partidas e "explode" essas mensagens para torcedores interessados. Este componente deve escalar horizontalmente.
+
+- `fanworker`: Responsável por enviar notificações para torcedores. Este componente também deve escalar horizontalmente devido ao potencial alto volume de notificações. Precisa processar eventos de partidas em tempo real para milhões de torcedores, especialmente em casos de grandes torcidas.
+
+
+Podemos configurar uma pipeline de `CI/CD` usando `GitHub Actions` para automatizar o build e push das imagens `Docker` para um `Docker registry`.
+
+Nessa esteira, ao ser validado cada componente, eles seriam deployados para seus respectivos conjuntos de `Pods` respeitando suas necessidades de escala.
 
 <br/>
 
