@@ -6,7 +6,7 @@ type UserCreateRequest struct {
 	UserName string `json:"usuario" validate:"required,min=3,max=255" binding:"required" example:"admin"`
 	Password string `json:"senha" validate:"required,min=5,max=255" binding:"required" example:"admin"`
 	Name     string `json:"nome" validate:"required,min=3,max=255" binding:"required" example:"Edson Arantes do Nascimento"`
-	Email    string `json:"email" validate:"required,min=5,max=255" binding:"required,email" example:"pele@soccerfan.com"`
+	Email    string `json:"email" validate:"required,email,min=5,max=255" binding:"required" example:"pele@soccerfan.com"`
 }
 
 type UserCreateResponse struct {

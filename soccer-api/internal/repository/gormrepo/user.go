@@ -101,8 +101,10 @@ func (u *User) Login(ctx context.Context, userName, password string) (string, er
 	uModel := model.User{}
 
 	err = u.db.WithContext(ctx).Model(User{}).Where("username = ?", userName).Take(&uModel).Error
-
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", errors.New("not found")
+		}
 		return "", err
 	}
 

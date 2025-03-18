@@ -104,7 +104,7 @@ Aguarde até que `api-rest` esteja funcional, exibindo uma mensagem semelhante �
 api-rest-1 | 2025/03/17 19:17:38 stdout: [GIN-debug] Listening and serving HTTP on :8080
 ```
 
-A `REST` `API` deve responder no caminho `http://localhost:8080`
+A `REST` `API` deve responder no caminho `http://localhost:8080/campeonatos`
 
 <br/>
 <div align="center">. . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
@@ -267,6 +267,16 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
         >  "mensagem": "O jogo terminou com placar 7-1"
         > }
         > ```
+        >
+        > `ALTERNATIVAMENTE`
+        >
+       > ```json
+        > {
+        >  "tipo": "inicio",
+        >  "time": "Flamengo",
+        >  "mensagem": "O jogo iniciou"
+        > }
+        > ```
    - `Response body:`
         > ```json
         > {
@@ -276,7 +286,7 @@ Deve-se informar como `Authozition` `Baerer` o valor do `token` informado apos c
 
 <br/>
 
-7. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/). Ele captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do `broadcast`.
+1. O `client` do `Mailhog` pode ser acessado na url: [http://localhost:8025/](http://localhost:8025/). Ele captura os emails enviados aos torcedores da aplicação, validando o adequado funcionamento do `broadcast`.
    - Tela do `Mailhog`
       - <div align="center"><img src="./docs/assets/images/layout/screen-captures/mailhog_client_browser.png"></div>
       -  Caso os emails não apareçam  imediatamente após o endpoint de `broadcast` ter respondido com `status-code` `202` e com ` "mensagem": "Notificação enviada"` clique no botao de refresh `🔄` do `Mailhog`
@@ -456,12 +466,20 @@ Contrate artistas para projetos comerciais ou mais elaborados e aprenda a ser en
 Os principais requisitos foram atendidos, mas existem pontos de melhoria evidentes que devem ser priorizados em projetos continuados.
 
 - Pontos de Melhoria
+    - Filtros opcionais
     - Aumento da cobertura de teste se faz necessário
+    - Formatar mensagens de erro do validador
     - Esteira de `CI` com `GithubActions` para garantir mesclagens seguras
-    - Teste de performance com `Gatling` ou `K6` para validar o fluxo de envio de notificações
+
+<br/>
+
+- Desejáveis
+    - Adotar um `Identity Manager`  mais robusto como `Keycloack` para geranciamento de `roles` (torcedor, usuário admin)
     - Arquitetar maneira de automatizar os envios de `broadcast`, em vez de depender do acesso a um endpoint específico.
+    - Teste de performance com `Gatling` ou `K6` para validar o fluxo de envio de notificações
     - Pela proposta do envio em massa que conta com dois `workers` para garantir a escalabilidade, um bom acrescimo ao projeto seria `Observabilidade`. `Prometheus`, `Grafana` e `Loki` seriam bem vindos.
 
+<br/>
 
 Este desafio me permite consolidar conhecimentos e identificar pontos cegos para aprimoramento. Continuarei trabalhando para evoluir o projeto e expandir minhas habilidades.
 
