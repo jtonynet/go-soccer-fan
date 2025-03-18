@@ -139,7 +139,7 @@ Uma vez importados os campeonatos e com o projeto em execução, os endpoints e 
     - 🟢 Rotas que podem ser acessadas sem autenticação
     - 🔴 Rotas que exigem autenticação
 
-Deve-se informar como `Authorization` `Baerer` o valor do `token` informado apos consulta rota `/auth/login` nas requisições das 🔴 Rotas que exigem autenticação. 
+Deve-se informar como `Authorization` `Baerer` o valor do `token` informado após consulta rota `/auth/login` nas requisições das 🔴 Rotas que exigem autenticação. 
 
 <br/>
 
@@ -312,7 +312,7 @@ Deve-se informar como `Authorization` `Baerer` o valor do `token` informado apos
 <a id="tests"></a>
 ### ✅ Testes
 
-Evitando conflitos no desenvolvimento, uma vez que estamos desenvolvendo com `dockerizado` com `live reload` (o `Dockerfile` foi criado visando exclusivamente desenvolvimento e validação.), com as dependencias sendo executadas use o seguinte comando:
+Evitando conflitos no desenvolvimento, uma vez que estamos desenvolvendo `dockerizado` com `live reload` (o `Dockerfile` foi criado visando exclusivamente desenvolvimento e validação.), com as dependencias sendo executadas use o seguinte comando:
 ```bash
 docker exec -ti soccer-api-rest-1 go test -v -count=1 ./internal/routes
 ```
