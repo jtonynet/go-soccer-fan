@@ -52,10 +52,23 @@ func NewGinRoutes(
 
 		fResp, err := fanService.Create(&fReq)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"erro": "erro interno, tente novamente mais tarde",
-			})
-			return
+			switch err.Error() {
+			case "duplicated":
+				c.JSON(http.StatusBadRequest, gin.H{
+					"erro": "torcedor indisponível para criação.",
+				})
+				return
+			case "not found":
+				c.JSON(http.StatusNotFound, gin.H{
+					"erro": "time não encontrado.",
+				})
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"erro": "erro interno, tente novamente mais tarde.",
+				})
+				return
+			}
 		}
 
 		c.JSON(http.StatusAccepted, fResp)
@@ -79,6 +92,12 @@ func NewGinRoutes(
 
 		uResp, err := userService.Create(&uReq)
 		if err != nil {
+			if err.Error() == "duplicated" {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"erro": "usuário indisponível para criação.",
+				})
+				return
+			}
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"erro": "erro interno, tente novamente mais tarde",
 			})
@@ -158,6 +177,13 @@ func NewGinRoutes(
 
 		bResp, err := broadcastService.Publish(&bReq)
 		if err != nil {
+			if err.Error() == "not found" {
+				c.JSON(http.StatusNotFound, gin.H{
+					"erro": "time não encontrado.",
+				})
+				return
+			}
+
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"erro": "erro interno, tente novamente mais tarde",
 			})

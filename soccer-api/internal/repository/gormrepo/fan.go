@@ -2,6 +2,7 @@ package gormrepo
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/database"
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/entity"
@@ -23,6 +24,9 @@ func (f *Fan) Create(ctx context.Context, fEntity *entity.Fan) (*entity.Fan, err
 
 	var team model.Team
 	if err := f.db.WithContext(ctx).Where("name = ?", fEntity.Team.Name).First(&team).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("not found")
+		}
 		return nil, err
 	}
 
@@ -34,6 +38,9 @@ func (f *Fan) Create(ctx context.Context, fEntity *entity.Fan) (*entity.Fan, err
 	}
 
 	if err := f.db.WithContext(ctx).Create(fModel).Error; err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, errors.New("duplicated")
+		}
 		return nil, err
 	}
 
