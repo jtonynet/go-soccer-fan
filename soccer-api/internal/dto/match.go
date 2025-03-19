@@ -23,14 +23,24 @@ type CompetitionNested struct {
 	ID int `json:"id"`
 }
 
+type Score struct {
+	FullTime ScoreTime `json:"fullTime"`
+	HalfTime ScoreTime `json:"halfTime"`
+}
+
+type ScoreTime struct {
+	Home *int `json:"home"`
+	Away *int `json:"away"`
+}
+
 type MatchResponseExternalAPI struct {
-	ID            int               `json:"id"`
-	Competition   CompetitionNested `json:"competition"`
-	HomeTeam      TeamNested        `json:"homeTeam"`
-	AwayTeam      TeamNested        `json:"awayTeam"`
-	Round         int               `json:"matchday"`
-	HomeTeamScore *int              `json:"home_team_score"`
-	AwayTeamScore *int              `json:"away_team_score"`
+	ID          int               `json:"id"`
+	Status      string            `json:"status"`
+	Competition CompetitionNested `json:"competition"`
+	HomeTeam    TeamNested        `json:"homeTeam"`
+	AwayTeam    TeamNested        `json:"awayTeam"`
+	Round       int               `json:"matchday"`
+	Score       Score             `json:"score"`
 }
 
 type MatchResponseListExternalAPI struct {
