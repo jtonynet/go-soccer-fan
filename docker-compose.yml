@@ -1,7 +1,7 @@
 name: soccer
 
 networks:
-  network:
+  fan_network:
     driver: bridge
 
 volumes:
@@ -29,7 +29,7 @@ services:
       - soccer-postgres-data:/var/lib/postgresql/data
       - .docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
-      - network
+      - fan_network
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -47,7 +47,7 @@ services:
       timeout: 15s
       retries: 10
     networks:
-      - network
+      - fan_network
 
 
   mailhog:
@@ -71,7 +71,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - network
+      - fan_network
 
    # Proxy to add TLS encryption on development env, because gomail needs TLS
   stunnel:
@@ -82,7 +82,7 @@ services:
      - STUNNEL_ACCEPT=465
      - STUNNEL_CONNECT=mailhog:1025
    networks:
-     - network
+     - fan_network
    healthcheck:
      test: ["CMD", "curl", "--insecure", "--fail", "https://localhost:465"]
      interval: 30s
@@ -102,7 +102,7 @@ services:
     volumes:
       - ./soccer-api:/usr/src/app
     networks:
-      - network
+      - fan_network
     depends_on:
       - postgres
       - rabbitmq
@@ -121,7 +121,7 @@ services:
     volumes:
       - ./soccer-api:/usr/src/app
     networks:
-      - network
+      - fan_network
     depends_on:
       - postgres
       - rabbitmq
@@ -139,7 +139,7 @@ services:
     volumes:
       - ./soccer-api:/usr/src/app
     networks:
-      - network
+      - fan_network
     depends_on:
       - postgres
       - rabbitmq
@@ -158,9 +158,13 @@ services:
     volumes:
       - ./soccer-api:/usr/src/app
     networks:
-      - network
+      - fan_network
     depends_on:
       - postgres
-    entrypoint: ["/usr/src/app/cli-dev-entrypoint.sh"]
+    command: CompileDaemon -build="go build -o /usr/src/app/bin/cli/main /usr/src/app/cmd/cli/main.go" -command="./bin/cli/main"
 
-    
+
+    # docker run --env-file ./soccer-api/.env --network soccer_fan_network -it soccer-api-cli /bin/sh
+    # docker run --env-file ./soccer-api/.env --network soccer_fan_network soccer-api-cli ./cmd/bin/main import competitions
+
+
