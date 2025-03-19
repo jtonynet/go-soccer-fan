@@ -40,6 +40,8 @@ func (m *Match) CreateOrUpdateInBatch(ctx context.Context, mEntities []*entity.M
 			Round:         e.Round,
 			HomeTeamID:    e.HomeTeam.ID,
 			AwayTeamID:    e.AwayTeam.ID,
+			HomeTeamScore: e.HomeTeamScore,
+			AwayTeamScore: e.AwayTeamScore,
 		})
 	}
 

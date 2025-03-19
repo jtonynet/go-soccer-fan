@@ -18,6 +18,8 @@ import (
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/repository"
 )
 
+var statusFineshed = "FINISHED"
+
 var retryInitialInterval = time.Duration(1)
 var retryMaxElapsedTime = time.Duration(60)
 
@@ -194,6 +196,28 @@ func (s *DataFetch) fetchAndStoreMatches(ctx context.Context, cEntity *entity.Co
 			aTeamCachedEntity = value.(*entity.Team)
 		}
 
+		var homeTeamScore int
+		var awayTeamScore int
+		if mResponse.Status == statusFineshed {
+			homeTeamScore = 0
+			if mResponse.Score.FullTime.Home != nil {
+				homeTeamScore += *mResponse.Score.FullTime.Home
+			}
+
+			if mResponse.Score.HalfTime.Home != nil {
+				homeTeamScore += *mResponse.Score.HalfTime.Home
+			}
+
+			awayTeamScore = 0
+			if mResponse.Score.FullTime.Away != nil {
+				awayTeamScore += *mResponse.Score.FullTime.Away
+			}
+
+			if mResponse.Score.HalfTime.Away != nil {
+				awayTeamScore += *mResponse.Score.HalfTime.Away
+			}
+		}
+
 		if cCachedEntity != nil && hTeamCachedEntity != nil && aTeamCachedEntity != nil {
 			matchEntities = append(matchEntities, &entity.Match{
 				UID:           uuid.New(),
@@ -202,8 +226,8 @@ func (s *DataFetch) fetchAndStoreMatches(ctx context.Context, cEntity *entity.Co
 				CompetitionID: cCachedEntity.ID,
 				HomeTeam:      hTeamCachedEntity,
 				AwayTeam:      aTeamCachedEntity,
-				HomeTeamScore: nil,
-				AwayTeamScore: nil,
+				HomeTeamScore: &homeTeamScore,
+				AwayTeamScore: &awayTeamScore,
 			})
 		}
 
