@@ -3,6 +3,8 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"reflect"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -12,17 +14,20 @@ import (
 	"github.com/jtonynet/go-soccer-fan/soccer-api/internal/service"
 )
 
-var Validator *validator.Validate
-
-type ginRoutes struct {
-	engine *gin.Engine
-}
-
 /*
 	TODO:
 	  - Segregar os métodos resolvidos nas rotas para controllers específicas.
 	  - Melhorar o tratamento de erros do validador.
 */
+
+type ValidationErrorMessage struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+type ginRoutes struct {
+	engine *gin.Engine
+}
 
 func NewGinRoutes(
 	userService *service.User,
@@ -30,9 +35,8 @@ func NewGinRoutes(
 	fanService *service.Fan,
 	broadcastService *service.Broadcast,
 ) *ginRoutes {
+	validate := validator.New()
 	e := gin.Default()
-
-	initValidator()
 
 	e.POST("/torcedores", func(c *gin.Context) {
 		var fReq dto.FanCreateRequest
@@ -43,9 +47,16 @@ func NewGinRoutes(
 			return
 		}
 
-		if err := validateStruct(&fReq); err != nil {
+		err := validate.Struct(fReq)
+		if err != nil {
+			if validationErrors, ok := err.(validator.ValidationErrors); ok {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"erro": formatValidationErrors(validationErrors, &dto.FanCreateRequest{}),
+				})
+				return
+			}
 			c.JSON(http.StatusBadRequest, gin.H{
-				"erro": getValidationErrorMessages(err),
+				"erro": "corpo da requisição inválido!",
 			})
 			return
 		}
@@ -83,9 +94,16 @@ func NewGinRoutes(
 			return
 		}
 
-		if err := validateStruct(&uReq); err != nil {
+		err := validate.Struct(uReq)
+		if err != nil {
+			if validationErrors, ok := err.(validator.ValidationErrors); ok {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"erro": formatValidationErrors(validationErrors, &dto.UserCreateRequest{}),
+				})
+				return
+			}
 			c.JSON(http.StatusBadRequest, gin.H{
-				"erro": getValidationErrorMessages(err),
+				"erro": "corpo da requisição inválido!",
 			})
 			return
 		}
@@ -117,26 +135,39 @@ func NewGinRoutes(
 			return
 		}
 
-		if err := validateStruct(&uReq); err != nil {
+		err := validate.Struct(uReq)
+		if err != nil {
+			if validationErrors, ok := err.(validator.ValidationErrors); ok {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"erro": formatValidationErrors(validationErrors, &dto.UserLoginRequest{}),
+				})
+				return
+			}
 			c.JSON(http.StatusBadRequest, gin.H{
-				"erro": getValidationErrorMessages(err),
+				"erro": "corpo da requisição inválido!",
 			})
 			return
 		}
 
 		uResp, err := userService.Login(&uReq)
 		if err != nil {
-			if err.Error() == "not found" {
+			switch err.Error() {
+			case "not found":
 				c.JSON(http.StatusNotFound, gin.H{
-					"erro": "usuario ou senha incorretos.",
+					"erro": "usuário não existente.",
+				})
+				return
+			case "incorrect password":
+				c.JSON(http.StatusBadRequest, gin.H{
+					"erro": "senha incorreta.",
+				})
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"erro": "erro interno, tente novamente mais tarde",
 				})
 				return
 			}
-
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"erro": "erro interno, tente novamente mais tarde",
-			})
-			return
 		}
 
 		c.JSON(http.StatusAccepted, uResp)
@@ -175,9 +206,16 @@ func NewGinRoutes(
 			return
 		}
 
-		if err := validateStruct(&bReq); err != nil {
+		err := validate.Struct(bReq)
+		if err != nil {
+			if validationErrors, ok := err.(validator.ValidationErrors); ok {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"erro": formatValidationErrors(validationErrors, &dto.BroadcastSendRequest{}),
+				})
+				return
+			}
 			c.JSON(http.StatusBadRequest, gin.H{
-				"erro": getValidationErrorMessages(err),
+				"erro": "corpo da requisição inválido!",
 			})
 			return
 		}
@@ -210,24 +248,48 @@ func (gr *ginRoutes) Run(port int) error {
 	return gr.engine.Run(fmt.Sprintf(":%v", port))
 }
 
-func initValidator() {
-	Validator = validator.New()
-}
+func formatValidationErrors(validationErrors validator.ValidationErrors, obj interface{}) []ValidationErrorMessage {
+	var errors []ValidationErrorMessage
 
-func validateStruct(s interface{}) error {
-	if err := Validator.Struct(s); err != nil {
-		return err
+	objType := reflect.TypeOf(obj)
+	if objType.Kind() == reflect.Ptr {
+		objType = objType.Elem()
 	}
-	return nil
-}
+	if objType.Kind() != reflect.Struct {
+		fmt.Println("obj não é uma struct ou um ponteiro para uma struct")
+		return errors
+	}
 
-func getValidationErrorMessages(err error) string {
-	if errs, ok := err.(validator.ValidationErrors); ok {
-		var messages string
-		for _, e := range errs {
-			messages += fmt.Sprintf("Erro no campo '%s': %s; ", e.Field(), e.Tag())
+	for _, e := range validationErrors {
+		fieldName := e.Field()
+
+		field, ok := objType.FieldByName(fieldName)
+		var jsonTag string
+		if ok {
+			jsonTag = field.Tag.Get("json")
 		}
-		return messages
+		if jsonTag == "" {
+			jsonTag = fieldName
+		}
+
+		var message string
+		switch e.Tag() {
+		case "required":
+			message = fmt.Sprintf("%s é obrigatório", jsonTag)
+		case "min":
+			message = fmt.Sprintf("%s deve ter no mínimo %s caracteres", jsonTag, e.Param())
+		case "max":
+			message = fmt.Sprintf("%s deve ter no máximo %s caracteres", jsonTag, e.Param())
+		case "oneof":
+			message = fmt.Sprintf("%s deve ser um dos seguintes valores: %s", jsonTag, strings.Join(strings.Split(e.Param(), " "), ", "))
+		default:
+			message = fmt.Sprintf("%s não é válido", jsonTag)
+		}
+
+		errors = append(errors, ValidationErrorMessage{
+			Field:   jsonTag,
+			Message: message,
+		})
 	}
-	return "validação falhou"
+	return errors
 }

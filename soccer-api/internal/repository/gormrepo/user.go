@@ -111,7 +111,7 @@ func (u *User) Login(ctx context.Context, userName, password string) (string, er
 	err = bcrypt.CompareHashAndPassword([]byte(uModel.Password), []byte(password))
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", err
+		return "", errors.New("incorrect password")
 	}
 
 	token, err := util.GenerateToken(uModel.ID)
