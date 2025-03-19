@@ -132,6 +132,10 @@ Saída esperada (rodando no terminal do VScode):
     <img src="./docs/assets/images/layout/screen-captures/cli_import_data_vscode_terminal.png">
 </div>
 
+_*[Troubleshoting fim de linha `LF` `CRLF`](https://www.reddit.com/r/docker/comments/18snd6k/line_ending_issues_while_working_with_windows/?rdt=55083): Caso ocorra erro na importação de dados, porém todas as outras imagens estejam funcionais menos a `soccer-api-cli`, verificar `Sequência de fim de linha` do arquivo `./soccer-api/cli-dev-entrypoint.sh` e o Sistema Operacinal hospedeiro do `Docker`. Caso `Windonws` esse arquivo deve ser `CRLF`; caso baseado em `Unix` deve ser `LF`._
+
+<br/>
+
 Isso facilita o uso de `CronJob`, `RunDeck` ou outros serviços de tarefas agendadas para que os dados sejam atualizados periodicamente.
 
 <br/>
