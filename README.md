@@ -127,7 +127,6 @@ Assim que iniciada, a database da `API` não possui dados de campeonatos. A impo
 ```bash
 docker exec -ti soccer-api-cli /usr/src/app/bin/cli/main import competitions
 ```
-
 Saída esperada (rodando no terminal do VScode):
 <div align="center">
     <img src="./docs/assets/images/layout/screen-captures/cli_import_data_vscode_terminal.png">
