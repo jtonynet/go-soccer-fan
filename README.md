@@ -20,7 +20,7 @@
 [<img src="./docs/assets/images/icons/miro.svg" width="25px" height="25px" alt="Miro Logo" title="Miro">](https://https://miro.com/)
 -->
 
-[![Badge Status](https://img.shields.io/badge/STATUS-EM_DESENVOLVIMENTO-green)](#header) [![Github Project](https://img.shields.io/badge/PROJECT%20VIEW-KANBAN-green?logo=github&logoColor=white)](https://github.com/users/jtonynet/projects/8) <!--[![Badge GitHubActions](https://github.com/jtonynet/go-pique-nique/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/jtonynet/go-pique-nique/actions) --> 
+[![Badge Status](https://img.shields.io/badge/STATUS-AGUARDANDO_AVALIAÇÃO-blue)](#header) [![Github Project](https://img.shields.io/badge/PROJECT%20VIEW-KANBAN-green?logo=github&logoColor=white)](https://github.com/users/jtonynet/projects/8) <!--[![Badge GitHubActions](https://github.com/jtonynet/go-pique-nique/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/jtonynet/go-pique-nique/actions) --> 
 
 [![Go Version](https://img.shields.io/badge/GO-1.23.2-blue?logo=go&logoColor=white)](https://go.dev/)
 
@@ -58,10 +58,19 @@ __[Go Soccer Fan](#header)__<br/>
 <a id="about"></a>
 ### 📖 Sobre
 
-Desafio para a criação de um sistema de consulta e armazenamento de torneios de futebol com seus respectivos times e partidas, consumindo dados de uma API externa com proteções contra rate limit. O sistema também deve armazenar dados de torcedores e, quando uma rota específica for acionada, disparar notificações de início e fim de partida para todos os torcedores cadastrados (podendo ser centenas ou até milhares). Seus componentes devem ser altamente escaláveis.
+Desafio para a criação de um `Sistema de Consulta, Armazenamento e Notificações de Torneios de Futebol` com seus respectivos times e partidas. Consumindo dados de uma `API externa` com proteções de `rate limit`.
 
-<br/>
+O sistema possui rotas autenticadas e armazena dados de torcedores. Quando uma rota específica for acionada, ele dispara notificações por `broadcast` de início e fim de partida para todos os torcedores cadastrados do time envolvido (podendo ser centenas ou até milhares). Planejado para ser altamente `escalável`.
 
+ - __Principais Tecnologias e Abordagens:__
+    - `TDD` `Happy-path` com foco na entrega,  `SOLID` e `ADRs`
+    - `REST` `API`, `CLI` e `WORKERS` binários segregados, seguindo boa prática GoLang para processamento distribuído e escalável.
+    - `JWT` para autenticação de rotas protegidas
+    - `Dockerized` solução com uso de containers
+    - `PostgreSQL` para armazenamento de dados
+    - `RabbitMQ` para a mensageria dos `eventos` de partidas (inicio e fim) e notificação (`broadcast`) de torcedores. Garante reenvios e deteccao de falhas robustas.
+    - `Mailhog` para simular um servidor de email
+    - `Concurrent Programming` principalmente para importação de dados da `API` externa
 
 <br/>
 
@@ -502,19 +511,23 @@ Contrate artistas para projetos comerciais ou mais elaborados e aprenda a ser en
 Os principais requisitos foram atendidos, mas existem pontos de melhoria evidentes que devem ser priorizados em projetos continuados.
 
 - Pontos de Melhoria
-    - Filtros opcionais
+    - Filtros opcionais (ver documento de requisitos do desafio)
     - Aumento da cobertura de teste se faz necessário
-    - Formatar mensagens de erro do validador
-    - Adotar um `Identity Manager`  mais robusto como `Keycloack` para geranciamento de `roles` (torcedor, usuário admin)
-    - Esteira de `CI` com `GithubActions` para garantir mesclagens seguras
     - Documentação Swagger
+    - Esteira de `CI` com `GithubActions` para garantir mesclagens seguras
+    - Esteira `CD` enviando os `artefatos` (recomendo imagens `docker` para um `docker-registry`) para `pipeline` de `deploy`
+    - Sistema de `logging` mais robusto (recomendo `slog` ou `zap`)
 
 <br/>
 
 - Desejáveis
-    - Arquitetar maneira de automatizar os envios de `broadcast`, em vez de depender do acesso a um endpoint específico.
+    - Melhorias nos dados relevantes da importação via `CLI` (necessário auxílio dos `stakeholders`)
+    - Implementar `Observabilidade`. `Prometheus`, `Grafana` e `Loki`.
     - Teste de performance com `Gatling` ou `K6` para validar o fluxo de envio de notificações
-    - Pela proposta do envio em massa que conta com dois `workers` para garantir a escalabilidade, um bom acrescimo ao projeto seria `Observabilidade`. `Prometheus`, `Grafana` e `Loki` seriam bem vindos.
+    - Teste de carga com `Gatling` ou `K6` para validar o volume de notificações
+    - Adotar um `Identity Manager`  mais robusto como `Keycloack` para geranciamento de `roles` (torcedor, usuário admin)
+    - Arquitetar maneira de automatizar os envios de `broadcast`, em vez de depender do acesso a um endpoint específico.
+
 
 <br/>
 
@@ -539,50 +552,3 @@ Este desafio me permite consolidar conhecimentos e identificar pontos cegos para
 <img src="./docs/assets/images/layout/footer.png" />
 </a>
 </div>
-
-<!-- 
-
-docker stop $(docker ps -aq)
-docker rm $(docker ps -aq)
-docker rmi $(docker images -q) --force
-docker volume rm $(docker volume ls -q) --force
-docker network prune -f
-docker system prune -a --volumes
-
-sudo systemctl restart docker
-
-#TEST SEEDER
-
-INSERT INTO competitions (uid, name, season, created_at, updated_at)
-VALUES
-    ('00000000-0000-0000-0000-000000001001', 'Campeonato Brasileiro', '2025', NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000001002', 'UEFA Champions League', '2025', NOW(), NOW());
-
-INSERT INTO teams (uid, name, created_at, updated_at)
-VALUES
-    ('00000000-0000-0000-0000-000000002001', 'Flamengo', NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000002002', 'Vasco', NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000002003', 'Santos', NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000002004', 'Corinthians', NOW(), NOW());
-
-INSERT INTO matches (uid, round, competition_id, home_team_id, away_team_id, home_team_score, away_team_score, created_at, updated_at)
-VALUES
-    ('00000000-0000-0000-0000-000000003001', 1, 1, 1, 2, 2, 1, NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000003002', 1, 1, 3, 4, 2, 2, NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000003003', 2, 1, 1, 4, NULL, NULL, NOW(), NOW());
-
-
-TRUNCATE TABLE public.competitions RESTART IDENTITY CASCADE;
-TRUNCATE TABLE public.teams RESTART IDENTITY CASCADE;
-TRUNCATE TABLE public.fans RESTART IDENTITY CASCADE;
-TRUNCATE TABLE public.matches RESTART IDENTITY CASCADE;
-
-ALTER SEQUENCE public.competitions_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.fans_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.matches_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.teams_id_seq RESTART WITH 1;
-
-mailhog: http://localhost:8025/
-rabbitMQ: http://localhost:15672/ - admin-admin
-
--->

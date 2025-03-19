@@ -17,7 +17,6 @@ import (
 /*
 	TODO:
 	  - Segregar os métodos resolvidos nas rotas para controllers específicas.
-	  - Melhorar o tratamento de erros do validador.
 */
 
 type ValidationErrorMessage struct {
@@ -175,7 +174,13 @@ func NewGinRoutes(
 	})
 
 	e.GET("/campeonatos", middleware.JwtAuthMiddleware(), func(c *gin.Context) {
-		result, _ := competitionService.FindAll()
+		result, err := competitionService.FindAll()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"erro": "erro interno, tente novamente mais tarde",
+			})
+			return
+		}
 		c.JSON(http.StatusOK, result)
 	})
 
