@@ -161,10 +161,4 @@ services:
       - fan_network
     depends_on:
       - postgres
-    command: CompileDaemon -build="go build -o /usr/src/app/bin/cli/main /usr/src/app/cmd/cli/main.go" -command="./bin/cli/main"
-
-
-    # docker run --env-file ./soccer-api/.env --network soccer_fan_network -it soccer-api-cli /bin/sh
-    # docker run --env-file ./soccer-api/.env --network soccer_fan_network soccer-api-cli ./cmd/bin/main import competitions
-
-
+    entrypoint: ["/usr/src/app/cli-dev-entrypoint.sh"]

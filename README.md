@@ -122,17 +122,11 @@ A `REST` `API` deve responder no caminho `http://localhost:8080/campeonatos`
 <a id="import-data"></a>
 #### ⚽ Importando Campeonatos
 
-Assim que iniciada, a database da `API` não possui dados de campeonatos. A importação dessas informações é realizada por meio de um `CLI` que obtém os dados da `API` externa. Para isso, na raiz do projeto e com ele rodando, execute o seguinte comando:
+Assim que iniciada, a database da `API` não possui dados de campeonatos. A importação dessas informações é realizada por meio de um `CLI` que obtém os dados da `API` externa. Para isso, com o projeto rodando, execute o seguinte comando:
 
 ```bash
-docker run --env-file ./soccer-api/.env --network soccer_fan_network -it soccer-api-cli /bin/sh
+docker exec -ti soccer-api-cli /usr/src/app/bin/cli/main import competitions
 ```
-e uma vez dentro do container, rode a importação com o comando:
-```bash
-./bin/cli/main import competitions
-```
-
-
 Saída esperada (rodando no terminal do VScode):
 <div align="center">
     <img src="./docs/assets/images/layout/screen-captures/cli_import_data_vscode_terminal.png">
